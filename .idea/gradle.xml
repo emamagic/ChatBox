@@ -14,7 +14,6 @@
             <option value="$PROJECT_DIR$/emoji" />
             <option value="$PROJECT_DIR$/message_input" />
             <option value="$PROJECT_DIR$/record_view" />
-            <option value="$PROJECT_DIR$/test" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
