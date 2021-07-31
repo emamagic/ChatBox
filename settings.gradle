@@ -1,0 +1,6 @@
+rootProject.name = "ChatBox"
+include ':app'
+include ':emoji'
+include ':record-view'
+include ':message_input'
+include ':test'
