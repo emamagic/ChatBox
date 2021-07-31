@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import com.emamagic.chatbox.ViewHelper;
 
 public class ReplyBar extends RelativeLayout {
 
@@ -33,7 +32,7 @@ public class ReplyBar extends RelativeLayout {
         inflate(getContext(), R.layout.reply_header_layout, this);
         ViewGroup.LayoutParams params = new LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewHelper.dpToPx(48)
+                ViewHelper.dpToPx(getContext(),48)
         );
         setLayoutParams(params);
 

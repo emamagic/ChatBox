@@ -31,8 +31,6 @@ import com.emamagic.record_view.RecordButton;
 import com.emamagic.record_view.RecordPermissionHandler;
 import com.emamagic.record_view.RecordView;
 import com.emamagic.record_view.ScaleAnim;
-import com.emamagic.chatbox.MessageFull;
-import com.emamagic.chatbox.ViewHelper;
 
 import java.io.File;
 import java.io.IOException;

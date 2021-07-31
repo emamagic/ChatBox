@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.emamagic.emoji.view.EmojiMultiAutoCompleteTextView;
 
+
 public class MessageEditText extends EmojiMultiAutoCompleteTextView {
 
     private KeyPreImeListener keyPreImeListener;

@@ -18,8 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 
-import com.emamagic.chatbox.ViewHelper;
-
 public class FontTextView extends AppCompatTextView {
 
     /**

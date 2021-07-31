@@ -43,7 +43,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
-        android:text="@string/you_are_watching_an_archived_conversation"
+        android:text="you are watching archive chat"
         android:textAlignment="center"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

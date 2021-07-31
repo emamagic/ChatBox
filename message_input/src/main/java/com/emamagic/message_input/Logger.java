@@ -1,8 +1,12 @@
-package com.emamagic.chatbox;
+package com.emamagic.message_input;
 
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.emamagic.emoji.BuildConfig;
+
 import java.util.Arrays;
 import java.util.List;
 

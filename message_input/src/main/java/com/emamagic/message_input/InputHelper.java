@@ -6,9 +6,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-
-import com.emamagic.chatbox.App;
-import com.emamagic.chatbox.Logger;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,10 +13,6 @@ import java.util.regex.Pattern;
 
 
 public class InputHelper {
-
-    public static String getString(@StringRes int drawableRes) {
-        return App.getInstance().getString(drawableRes);
-    }
 
     private static boolean isWhiteSpaces(@Nullable String s) {
         return s != null && s.matches("\\s+");
@@ -92,12 +85,10 @@ public class InputHelper {
         String oriContent = editText.getText().toString();
         int start = editText.getSelectionStart();
         int end = editText.getSelectionEnd();
-        Logger.e(start, end);
         if (start >= 0 && end > 0 && start != end) {
             editText.setText(editText.getText().replace(start, end, text));
         } else {
             int index = editText.getSelectionStart() >= 0 ? editText.getSelectionStart() : 0;
-            Logger.e(start, end, index);
             StringBuilder builder = new StringBuilder(oriContent);
             builder.insert(index, text);
             editText.setText(builder.toString());
