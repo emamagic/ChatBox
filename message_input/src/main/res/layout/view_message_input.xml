@@ -20,7 +20,7 @@
         app:layout_constraintEnd_toStartOf="@id/emojissButton"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.emamagic.messageinput.MessageEditText
+    <com.emamagic.message_input.MessageEditText
         android:id="@id/messageInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.emamagic.messageinput.FontTextView
+    <com.emamagic.message_input.FontTextView
         android:id="@+id/disable_text_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

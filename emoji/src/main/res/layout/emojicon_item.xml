@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <im.limoo.emoji.view.EmojiTextView
+    <com.emamagic.emoji.view.EmojiTextView
         android:id="@+id/emojicon_icon"
         android:layout_width="36dip"
         android:layout_height="36dip"
