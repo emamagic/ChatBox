@@ -23,10 +23,6 @@ import java.io.IOException;
 
 import io.supercharge.shimmerlayout.ShimmerLayout;
 
-/**
- * Created by Devlomi on 24/08/2017.
- */
-
 public class RecordView extends RelativeLayout {
 
     public static final int DEFAULT_CANCEL_BOUNDS = 8; //8dp

@@ -61,7 +61,6 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     private File recordFile;
     private VoiceListener voiceListener;
 
-
     private CharSequence input;
     private InputListener inputListener;
     private AttachmentsListener attachmentsListener;
@@ -82,13 +81,12 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     private boolean showAttachmentButton;
     private int keyboardHeight;
     private MessageFull messageToBeReturned;
-    private MessageInputStyle messageeInputStyle;
+    private MessageInputStyle messageInputStyle;
     private boolean canSubmit = true;
     private boolean isSaveDraftInQueue = false;
     private Runnable draftSaverRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.d("DRAFT ", "save draft : " + input);
             isSaveDraftInQueue = false;
             if (inputListener != null)
                 inputListener.onSaveDraft(input);
@@ -111,38 +109,21 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         init(context, attrs);
     }
 
-    /**
-     * Sets callback for 'submit' button.
-     *
-     * @param inputListener input callback
-     */
     public void setInputListener(InputListener inputListener) {
         this.inputListener = inputListener;
     }
 
-    /**
-     * Sets callback for 'add' button.
-     *
-     * @param attachmentsListener input callback
-     */
+
     public void setAttachmentsListener(AttachmentsListener attachmentsListener) {
         this.attachmentsListener = attachmentsListener;
     }
 
-    /**
-     * Returns EditText for messages input
-     *
-     * @return EditText
-     */
+
     public EditText getInputEditText() {
         return messageInput;
     }
 
-    /**
-     * Returns `submit` button
-     *
-     * @return ImageButton
-     */
+
     public ImageButton getButton() {
         return messageSendButton;
     }
@@ -160,7 +141,7 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
                     removeCallbacks(typingTimerRunnable);
                     post(typingTimerRunnable);
                 } else if (onRecordClickListener != null) {
-                    onRecordClickListener.onClick(view);
+                    onRecordClickListener.onRecordClick(view);
                 }
             } else if (id == R.id.attachmentButton) {
                 onAddAttachments();
@@ -169,16 +150,12 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         }
     };
 
-    /**
-     * This method is called to notify you that, within s,
-     * the count characters beginning at start have just replaced old text that had length before
-     */
     @Override
     public void onTextChanged(CharSequence s, int start, int count, int after) {
         input = s;
         if (s.length() <= 0) {
-            if (messageeInputStyle.isShowMicIcon()) {
-                this.messageSendButton.setImageDrawable(messageeInputStyle.getInputVoiceIcon());
+            if (messageInputStyle.isShowMicIcon()) {
+                this.messageSendButton.setImageDrawable(messageInputStyle.getInputVoiceIcon());
             } else {
                 messageSendButton.setEnabled(false);
                 messageSendButton.setVisibility(View.INVISIBLE);
@@ -198,25 +175,18 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         }
     }
 
-    /**
-     * This method is called to notify you that, within s,
-     * the count characters beginning at start are about to be replaced by new text with length after.
-     */
     @Override
     public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
         if (after > 0) {
-            if (!messageeInputStyle.isShowMicIcon()) {
+            if (!messageInputStyle.isShowMicIcon()) {
                 messageSendButton.setEnabled(true);
                 messageSendButton.setVisibility(VISIBLE);
             }
-            this.messageSendButton.setImageDrawable((messageeInputStyle.getInputButtonIcon()));
+            this.messageSendButton.setImageDrawable((messageInputStyle.getInputButtonIcon()));
 
         }
     }
 
-    /**
-     * This method is called to notify you that, somewhere within s, the text has been changed.
-     */
     @Override
     public void afterTextChanged(Editable editable) {
         //do nothing
@@ -264,41 +234,41 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     private void init(Context context, AttributeSet attrs) {
         init(context);
 
-        messageeInputStyle = MessageInputStyle.parse(context, attrs);
+        messageInputStyle = MessageInputStyle.parse(context, attrs);
 
-        this.messageInput.setMaxLines(messageeInputStyle.getInputMaxLines());
-        this.messageInput.setHint(messageeInputStyle.getInputHint());
-        if (messageeInputStyle.getInputText() != null && messageeInputStyle.getInputText().length() > 0) {
-            this.messageInput.setText(messageeInputStyle.getInputText());
-            this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
+        this.messageInput.setMaxLines(messageInputStyle.getInputMaxLines());
+        this.messageInput.setHint(messageInputStyle.getInputHint());
+        if (messageInputStyle.getInputText() != null && messageInputStyle.getInputText().length() > 0) {
+            this.messageInput.setText(messageInputStyle.getInputText());
+            this.messageSendButton.setImageDrawable(messageInputStyle.getInputButtonIcon());
         } else {
-            if (messageeInputStyle.isShowMicIcon()) {
-                this.messageSendButton.setImageDrawable(messageeInputStyle.getInputVoiceIcon());
+            if (messageInputStyle.isShowMicIcon()) {
+                this.messageSendButton.setImageDrawable(messageInputStyle.getInputVoiceIcon());
             } else {
                 messageSendButton.setEnabled(false);
-                this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
+                this.messageSendButton.setImageDrawable(messageInputStyle.getInputButtonIcon());
                 messageSendButton.setVisibility(View.INVISIBLE);
             }
         }
-        this.messageInput.setTextSize(TypedValue.COMPLEX_UNIT_PX, messageeInputStyle.getInputTextSize());
-        this.messageInput.setTextColor(messageeInputStyle.getInputTextColor());
-        this.messageInput.setHintTextColor(messageeInputStyle.getInputHintColor());
-        ViewCompat.setBackground(this.messageInput, messageeInputStyle.getInputBackground());
-        setCursor(messageeInputStyle.getInputCursorDrawable());
+        this.messageInput.setTextSize(TypedValue.COMPLEX_UNIT_PX, messageInputStyle.getInputTextSize());
+        this.messageInput.setTextColor(messageInputStyle.getInputTextColor());
+        this.messageInput.setHintTextColor(messageInputStyle.getInputHintColor());
+        ViewCompat.setBackground(this.messageInput, messageInputStyle.getInputBackground());
+        setCursor(messageInputStyle.getInputCursorDrawable());
 
-        showAttachmentButton = messageeInputStyle.showAttachmentButton();
+        showAttachmentButton = messageInputStyle.showAttachmentButton();
         this.attachmentButton.setVisibility(showAttachmentButton ? VISIBLE : GONE);
-        this.attachmentButton.setImageDrawable(messageeInputStyle.getAttachmentButtonIcon());
-        ViewCompat.setBackground(this.attachmentButton, messageeInputStyle.getAttachmentButtonBackground());
+        this.attachmentButton.setImageDrawable(messageInputStyle.getAttachmentButtonIcon());
+        ViewCompat.setBackground(this.attachmentButton, messageInputStyle.getAttachmentButtonBackground());
 
-        this.emojiButton.setVisibility(messageeInputStyle.showEmojiButton() ? VISIBLE : GONE);
-        this.emojiButton.setImageDrawable(messageeInputStyle.getEmojiButtonIcon());
-        ViewCompat.setBackground(this.emojiButton, messageeInputStyle.getEmojiButtonBackground());
+        this.emojiButton.setVisibility(messageInputStyle.showEmojiButton() ? VISIBLE : GONE);
+        this.emojiButton.setImageDrawable(messageInputStyle.getEmojiButtonIcon());
+        ViewCompat.setBackground(this.emojiButton, messageInputStyle.getEmojiButtonBackground());
 
-        ViewCompat.setBackground(messageSendButton, messageeInputStyle.getInputButtonBackground());
+        ViewCompat.setBackground(messageSendButton, messageInputStyle.getInputButtonBackground());
 
-        this.delayTypingStatusMillis = messageeInputStyle.getDelayTypingStatus();
-        this.delaySavingDraftInMillis = messageeInputStyle.getDelaySavingDraft();
+        this.delayTypingStatusMillis = messageInputStyle.getDelayTypingStatus();
+        this.delaySavingDraftInMillis = messageInputStyle.getDelaySavingDraft();
     }
 
     private void init(Context context) {
@@ -365,13 +335,13 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         this.messageToBeReturned = message;
         String text = message.getText();
         messageInput.setText(text);
-        this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonEditModeIcon());
+        this.messageSendButton.setImageDrawable(messageInputStyle.getInputButtonEditModeIcon());
     }
 
     public void appendText(String text) {
         messageInput.append(text);
         if (text != null && text.length() > 0) {
-            this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
+            this.messageSendButton.setImageDrawable(messageInputStyle.getInputButtonIcon());
         }
     }
 
@@ -391,14 +361,6 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         messageToBeReturned = null;
     }
 
-    /**
-     * set adapter for showing suggestion for mention
-     */
-//    public void setAutoCompleteAdapter(AutoCompleteAdapter adapter) {
-//        this.messageInput.setThreshold(1);
-//        this.messageInput.setAdapter(adapter);
-//        this.messageInput.setTokenizer(new AutoCompleteAdapter.MentionTokenizer());
-//    }
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -462,7 +424,7 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
 
 
     public boolean isListenForRecord() {
-        return messageeInputStyle.isShowMicIcon();
+        return messageInputStyle.isShowMicIcon();
     }
 
     public void setRecordView(RecordView recordView, Activity activity) {
@@ -520,68 +482,27 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         this.voiceListener = voiceListener;
     }
 
-    /*
-     * Interface definition for a callback to be invoked when user pressed 'submit' button
-     */
     public interface InputListener {
-
-
-        /**
-         * Fires when user presses 'send' button.
-         *
-         * @param input input entered by user
-         * @return if input text is valid, you must return {@code true} and input will be cleared, otherwise return false.
-         */
         boolean onSubmit(CharSequence input);
-
-        default boolean onEdit(CharSequence input, MessageFull messageToBeEdited) {
-            return false;
-        }
-
-        default boolean onReply(CharSequence input, MessageFull messageToBeEdited) {
-            return false;
-        }
-
-        default void onSaveDraft(CharSequence draft) {
-        }
+        default boolean onEdit(CharSequence input, MessageFull messageToBeEdited) { return false; }
+        default boolean onReply(CharSequence input, MessageFull messageToBeEdited) { return false; }
+        default void onSaveDraft(CharSequence draft) { }
     }
 
-    /**
-     * Interface definition for a callback to be invoked when user presses 'add' button
-     */
     public interface AttachmentsListener {
-
-
-        /**
-         * Fires when user presses 'add' button.
-         */
         void onAddAttachments(View attachmentBtnAnchor);
     }
 
-    /**
-     * Interface definition for a callback to be invoked when user typing
-     */
     public interface TypingListener {
-
-
-        /**
-         * Fires when user presses start typing
-         */
         void onStartTyping();
-
-        /**
-         * Fires when user presses stop typing
-         */
         void onStopTyping();
-
     }
 
     public interface VoiceListener {
-
         void onVoiceMessageFinish(String time, Uri uri);
     }
 
-    public static void hideKeyboard(@NonNull View view) {
+    public void hideKeyboard(@NonNull View view) {
         InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

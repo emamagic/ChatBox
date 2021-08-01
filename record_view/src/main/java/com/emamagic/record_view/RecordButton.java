@@ -147,6 +147,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     @Override
     public void onClick(View v) {
         if (onRecordClickListener != null)
-            onRecordClickListener.onClick(v);
+            onRecordClickListener.onRecordClick(v);
     }
 }

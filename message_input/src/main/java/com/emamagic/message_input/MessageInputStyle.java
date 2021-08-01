@@ -25,9 +25,6 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-/**
- * Style for MessageInputStyle customization by xml attributes
- */
 @SuppressWarnings("WeakerAccess")
 class MessageInputStyle extends Style {
 
