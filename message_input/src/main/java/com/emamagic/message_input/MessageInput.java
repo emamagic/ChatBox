@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
@@ -36,12 +38,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.UUID;
+
 import com.emamagic.emoji.EmojIconActions;
+
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
-/**
- * Component for input outcoming messages
- */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class MessageInput extends LinearLayout implements TextWatcher, View.OnFocusChangeListener,
         MessageEditText.KeyPreImeListener, View.OnTouchListener, RecordPermissionHandler, OnRecordListener {
@@ -50,16 +51,11 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     protected ImageButton messageSendButton;
     protected ImageButton emojiButton;
     protected ImageButton attachmentButton;
-    protected ReplyBar replyBar;
-    private FontTextView disableTextView;
-
-    private boolean inEditMode;
-    private boolean inReplyMode;
+    private TextView disableTextView;
 
     private Activity activity;
     private ScaleAnim scaleAnim;
     private RecordView recordView;
-    private boolean listenForRecord = true;
     private OnRecordClickListener onRecordClickListener;
     private AudioRecorder audioRecorder;
     private File recordFile;
@@ -156,21 +152,14 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         public void onClick(View view) {
             int id = view.getId();
             if (id == R.id.messageSendButton) {
-                if (canSubmit && !isListenForRecord()) {
+                if (canSubmit) {
                     canSubmit = false;
-                    boolean isSubmitted;
-                    if (inEditMode)
-                        isSubmitted = onEdit(messageToBeReturned);
-                    else if (inReplyMode)
-                        isSubmitted = onReply(messageToBeReturned);
-                    else isSubmitted = onSubmit();
-                    if (isSubmitted) {
-                        clear();
-                    }
+                    onSubmit();
+                    clear();
                     canSubmit = true;
                     removeCallbacks(typingTimerRunnable);
                     post(typingTimerRunnable);
-                } else if (onRecordClickListener != null){
+                } else if (onRecordClickListener != null) {
                     onRecordClickListener.onClick(view);
                 }
             } else if (id == R.id.attachmentButton) {
@@ -190,8 +179,7 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         if (s.length() <= 0) {
             if (messageeInputStyle.isShowMicIcon()) {
                 this.messageSendButton.setImageDrawable(messageeInputStyle.getInputVoiceIcon());
-            }
-            else {
+            } else {
                 messageSendButton.setEnabled(false);
                 messageSendButton.setVisibility(View.INVISIBLE);
             }
@@ -217,17 +205,12 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     @Override
     public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
         if (after > 0) {
-            if (messageeInputStyle.isShowMicIcon()) {
-                this.messageSendButton.setImageDrawable((messageeInputStyle.getInputButtonIcon()));
-                listenForRecord = false;
-            } else {
+            if (!messageeInputStyle.isShowMicIcon()) {
                 messageSendButton.setEnabled(true);
                 messageSendButton.setVisibility(VISIBLE);
-                messageSendButton.setImageDrawable((messageeInputStyle.getInputButtonIcon()));
             }
+            this.messageSendButton.setImageDrawable((messageeInputStyle.getInputButtonIcon()));
 
-        } else {
-            listenForRecord = true;
         }
     }
 
@@ -255,7 +238,7 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
 
     @Override
     public boolean onHideKeyboard() {
-        ViewHelper.hideKeyboard(messageInput);
+        hideKeyboard(messageInput);
         messageInput.clearFocus();
         return true;
     }
@@ -288,11 +271,9 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         if (messageeInputStyle.getInputText() != null && messageeInputStyle.getInputText().length() > 0) {
             this.messageInput.setText(messageeInputStyle.getInputText());
             this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
-            listenForRecord = false;
         } else {
             if (messageeInputStyle.isShowMicIcon()) {
                 this.messageSendButton.setImageDrawable(messageeInputStyle.getInputVoiceIcon());
-                listenForRecord = true;
             } else {
                 messageSendButton.setEnabled(false);
                 this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
@@ -324,7 +305,6 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         inflate(context, R.layout.view_message_input, this);
         setOrientation(VERTICAL);
 
-        replyBar = new ReplyBar(context);
         messageInput = findViewById(R.id.messageInput);
         messageSendButton = findViewById(R.id.messageSendButton);
         emojiButton = findViewById(R.id.emojissButton);
@@ -381,17 +361,9 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         this.typingListener = typingListener;
     }
 
-    public void setOnReplyBarCloseListener(ReplyBar.OnCloseListener onCloseListener) {
-        replyBar.setOnCloseListener(onCloseListener);
-    }
-
     public void enterEditMode(MessageFull message) {
         this.messageToBeReturned = message;
         String text = message.getText();
-        replyBar.setText(text);
-        replyBar.enterEditMode();
-        if (!inEditMode) addView(replyBar, 0);
-        inEditMode = true;
         messageInput.setText(text);
         this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonEditModeIcon());
     }
@@ -400,17 +372,7 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         messageInput.append(text);
         if (text != null && text.length() > 0) {
             this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
-            listenForRecord = false;
         }
-    }
-
-    public void enterReplyMode(MessageFull message) {
-        this.messageToBeReturned = message;
-        replyBar.setText(message.getTextModified().toString());
-        // TODO: 31.07.21 Show user display name
-        replyBar.enterReplyMode("user display name");
-        inReplyMode = true;
-        addView(replyBar, 0);
     }
 
     /***
@@ -423,30 +385,10 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         imm.showSoftInput(messageInput, InputMethodManager.SHOW_IMPLICIT);
     }
 
-    public void dismissReplyBar() {
-        if (replyBar.getParent() != null) {
-            removeView(replyBar);
-            this.messageSendButton.setImageDrawable(messageeInputStyle.getInputButtonIcon());
-            listenForRecord = false;
-            inEditMode = false;
-            inReplyMode = false;
-            messageInput.setText("");
-        }
-    }
-
     public void clear() {
-        dismissReplyBar();
         removeCallbacks(draftSaverRunnable);
         messageInput.setText("");
         messageToBeReturned = null;
-    }
-
-    public boolean isEditing() {
-        return inEditMode;
-    }
-
-    public boolean isInReplyMode() {
-        return inReplyMode;
     }
 
     /**
@@ -457,7 +399,6 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
 //        this.messageInput.setAdapter(adapter);
 //        this.messageInput.setTokenizer(new AutoCompleteAdapter.MentionTokenizer());
 //    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -519,13 +460,9 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
         messageInput.setVisibility(View.VISIBLE);
     }
 
-    public void setListenForRecord(boolean listenForRecord) {
-        this.listenForRecord = listenForRecord;
-    }
 
     public boolean isListenForRecord() {
-        if (!messageeInputStyle.isShowMicIcon()) return false;
-        return listenForRecord;
+        return messageeInputStyle.isShowMicIcon();
     }
 
     public void setRecordView(RecordView recordView, Activity activity) {
@@ -605,7 +542,8 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
             return false;
         }
 
-        default void onSaveDraft(CharSequence draft) { }
+        default void onSaveDraft(CharSequence draft) {
+        }
     }
 
     /**
@@ -641,5 +579,10 @@ public class MessageInput extends LinearLayout implements TextWatcher, View.OnFo
     public interface VoiceListener {
 
         void onVoiceMessageFinish(String time, Uri uri);
+    }
+
+    public static void hideKeyboard(@NonNull View view) {
+        InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
