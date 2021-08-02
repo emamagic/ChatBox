@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- MESSAGE INPUT -->
+    <item name="attachmentButton" type="id" />
+    <item name="emojiButton" type="id" />
+    <item name="messageSendButton" type="id" />
+    <item name="attachmentButtonSpace" type="id" />
+    <item name="emojiButtonSpace" type="id" />
+    <item name="sendButtonSpace" type="id" />
+    <item name="messageInput" type="id" />
+
+
+</resources>

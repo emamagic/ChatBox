@@ -1,0 +1,154 @@
+<resources>
+
+
+    <!--
+        App default margins
+        -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+
+    <!--
+        Text size
+        -->
+    <dimen name="text_xsmall">10dp</dimen>
+    <dimen name="text_small">12dp</dimen>
+    <dimen name="text_medium">14dp</dimen>
+    <dimen name="text_large">16dp</dimen>
+    <dimen name="text_xlarge">18dp</dimen>
+    <dimen name="text_huge">24dp</dimen>
+
+
+    <!--
+        Spacing
+        -->
+    <dimen name="spacing_nano">2dp</dimen>
+    <dimen name="spacing_micro">4dp</dimen>
+    <dimen name="spacing_normal">8dp</dimen>
+    <dimen name="spacing_xs_large">16dp</dimen>
+    <dimen name="spacing_s_large">24dp</dimen>
+    <dimen name="spacing_large">32dp</dimen>
+    <dimen name="spacing_xlarge">48dp</dimen>
+    <dimen name="spacing_huge">64dp</dimen>
+    <dimen name="spacing_super_huge">80dp</dimen>
+    <dimen name="spacing_xsuper_huge">95dp</dimen>
+    <dimen name="grid_spacing">0dp</dimen>
+    <dimen name="avatar_margin">16dp</dimen>
+    <dimen name="avatar_margin_end">16dp</dimen>
+
+
+    <!--
+        Spacing
+        -->
+    <dimen name="image_small">48dp</dimen>
+    <dimen name="image_medium">64dp</dimen>
+    <dimen name="image_large">72dp</dimen>
+    <dimen name="avatar_huge">100dp</dimen>
+
+
+    <!--
+        Floating action button
+        -->
+    <dimen name="fab_spacing">86dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+
+    <!--
+        Icon size
+        -->
+    <dimen name="main_logo_size">110dp</dimen>
+    <dimen name="large_icon_size">48dp</dimen>
+    <dimen name="header_icon_zie">64dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="small_icon_size">12dp</dimen>
+
+
+    <!--
+        Message
+        -->
+    <dimen name="spinner_small">24dp</dimen>
+    <dimen name="spinner_medium">48dp</dimen>
+    <dimen name="spinner_large">64dp</dimen>
+
+
+    <!--
+       Conversation
+       -->
+    <dimen name="conversation_avatar_width">56dp</dimen>
+    <dimen name="conversation_avatar_height">56dp</dimen>
+    <dimen name="conversation_last_message_avatar_width">24dp</dimen>
+    <dimen name="conversation_last_message_avatar_height">24dp</dimen>
+    <dimen name="conversation_title_text_size">18sp</dimen>
+    <dimen name="conversation_message_text_size">16sp</dimen>
+    <dimen name="conversation_date_text_size">14sp</dimen>
+    <dimen name="conversation_unread_bubble_text_size">13sp</dimen>
+    <dimen name="conversation_divider_margin_left">88dp</dimen>
+    <dimen name="conversation_divider_margin_right">0dp</dimen>
+
+
+    <!--
+        Message
+        -->
+    <dimen name="message_avatar_width">40dp</dimen>
+    <dimen name="message_avatar_height">40dp</dimen>
+    <dimen name="message_padding_left">8dp</dimen>
+    <dimen name="message_padding_right">8dp</dimen>
+    <dimen name="message_padding_top">12dp</dimen>
+    <dimen name="message_padding_bottom">6dp</dimen>
+    <dimen name="message_text_size">17sp</dimen>
+    <dimen name="message_time_text_size">14sp</dimen>
+    <dimen name="message_date_header_text_size">16sp</dimen>
+    <dimen name="message_date_header_padding">16dp</dimen>
+    <dimen name="message_incoming_bubble_margin_right">40dp</dimen>
+    <dimen name="message_outcoming_bubble_margin_left">65dp</dimen>
+    <dimen name="message_outcoming_bubble_margin_right">15dp</dimen>
+    <dimen name="message_bubble_corners_radius">12dp</dimen>
+
+
+    <!--
+       Message input layout
+       -->
+    <dimen name="auto_complete_avatar_width">30dp</dimen>
+    <dimen name="auto_complete_avatar_height">30dp</dimen>
+    <dimen name="input_button_width">24dp</dimen>
+    <dimen name="input_button_height">24dp</dimen>
+    <dimen name="input_button_margin">8dp</dimen>
+    <dimen name="input_text_size">17sp</dimen>
+    <dimen name="input_padding_left">12sp</dimen>
+    <dimen name="input_padding_right">12sp</dimen>
+    <dimen name="input_padding_top">8sp</dimen>
+    <dimen name="input_padding_bottom">8sp</dimen>
+
+
+    <dimen name="transfer_controls_expanded_width">150dp</dimen>
+    <dimen name="transfer_controls_contracted_width">70dp</dimen>
+
+
+    <!--
+        Other
+        -->
+    <dimen name="keyline_1">72dp</dimen>
+    <dimen name="keyline_2">76dp</dimen>
+    <dimen name="bbn_top_shadow_height">@dimen/spacing_micro</dimen>
+    <dimen name="box_button_height">64dp</dimen>
+    <dimen name="divider_height">1px</dimen>
+    <dimen name="navigation_view_width">320dp</dimen>
+    <dimen name="conversation_viewholder_height">40dp</dimen>
+    <dimen name="custom_radio_length">120dp</dimen>
+    <dimen name="contacts_viewholder_height">75dp</dimen>
+    <dimen name="emoji_keyboard_size">250dip</dimen>
+
+
+    <dimen name="chat_username_text_size">12sp</dimen>
+    <dimen name="chat_time_text_size">12sp</dimen>
+    <dimen name="chat_text_size">15sp</dimen>
+    <dimen name="forward_bottom_sheet_send_button_height">40dp</dimen>
+
+    <dimen name="create_group_activity_components_height">40dp</dimen>
+    <dimen name="standard_64">64dp</dimen>
+    <dimen name="standard_128">128dp</dimen>
+    <dimen name="standard_192">192dp</dimen>
+    <dimen name="dialog_width">280dp</dimen>
+
+
+</resources>
