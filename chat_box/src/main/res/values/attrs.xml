@@ -95,4 +95,10 @@
 
     </declare-styleable>
 
+    <declare-styleable name="RecordButton">
+
+        <attr name="mic_icon" format="reference" />
+
+    </declare-styleable>
+
 </resources>

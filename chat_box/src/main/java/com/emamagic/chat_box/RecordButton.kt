@@ -10,17 +10,15 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 
 class RecordButton @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : AppCompatImageView(context, attrs), View.OnTouchListener, View.OnClickListener {
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : AppCompatImageView(context, attrs, defStyleAttr), View.OnTouchListener, View.OnClickListener {
 
     private lateinit var scaleAnim: ScaleAnim
     private lateinit var recordView: RecordView
     private lateinit var onRecordClickListener: OnRecordClickListener
     private var listenForRecord = true
 
-    init {
-        init(context, attrs)
-    }
+    init { init(context, attrs) }
 
     fun setRecordView(recordView: RecordView) {
         this.recordView = recordView
@@ -31,9 +29,7 @@ class RecordButton @JvmOverloads constructor(
         if (attrs != null) {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton)
             val imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1)
-            if (imageResource != -1) {
-                setTheImageResource(imageResource)
-            }
+            if (imageResource != -1) { setTheImageResource(imageResource) }
             typedArray.recycle()
         }
         scaleAnim = ScaleAnim(this)

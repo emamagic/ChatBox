@@ -22,7 +22,8 @@ class AnimationHelper(
     private val smallBlinkingMic: ImageView,
     private val recordButtonGrowingAnimationEnabled: Boolean
 ) {
-    private lateinit var animatedVectorDrawable: AnimatedVectorDrawableCompat
+    private var animatedVectorDrawable: AnimatedVectorDrawableCompat? =
+        AnimatedVectorDrawableCompat.create(context, R.drawable.recv_basket_animated)
     private lateinit var alphaAnimation: AlphaAnimation
     private lateinit var onBasketAnimationEndListener: OnBasketAnimationEnd
     private var isBasketAnimating = false
@@ -30,23 +31,19 @@ class AnimationHelper(
     private var micX = 0f
     private var micY: Float = 0f
     private lateinit var micAnimation: AnimatorSet
+    private var recordBtnGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled
     private lateinit var translateAnimation1: TranslateAnimation
     private lateinit var translateAnimation2: TranslateAnimation
     private lateinit var handler1: Handler
     private lateinit var handler2: Handler
 
 
-    init {
-        animatedVectorDrawable =
-            AnimatedVectorDrawableCompat.create(context, R.drawable.recv_basket_animated)
-    }
-
     fun setTrashIconColor(color: Int) {
-        animatedVectorDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+        animatedVectorDrawable?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
     fun setRecordButtonGrowingAnimationEnabled(recordButtonGrowingAnimationEnabled: Boolean) {
-        this.recordButtonGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled
+        this.recordBtnGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled
     }
 
     @SuppressLint("RestrictedApi")
@@ -78,7 +75,7 @@ class AnimationHelper(
         translateAnimation1.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
-                animatedVectorDrawable.start()
+                animatedVectorDrawable?.start()
                 handler2 = Handler()
                 handler2.postDelayed({
                     basketImg.startAnimation(translateAnimation2)
@@ -158,7 +155,7 @@ class AnimationHelper(
             val x = animation.animatedValue as Float
             recordBtn.x = x
         }
-        if (recordButtonGrowingAnimationEnabled) {
+        if (recordBtnGrowingAnimationEnabled) {
             recordBtn.stopScale()
         }
         positionAnimator.duration = 0

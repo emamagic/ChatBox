@@ -7,14 +7,12 @@ import android.util.AttributeSet
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.DrawableCompat
+import com.emamagic.chat_box.Const.DEFAULT_DELAY_SAVING_DRAFT
+import com.emamagic.chat_box.Const.DEFAULT_DELAY_TYPING_STATUS
+import com.emamagic.chat_box.Const.DEFAULT_INT_VALUE
+import com.emamagic.chat_box.Const.DEFAULT_MAX_LINES
 
-private const val DEFAULT_MAX_LINES = 5
-private const val DEFAULT_DELAY_TYPING_STATUS = 1000
-private const val DEFAULT_DELAY_SAVING_DRAFT = 1000
-private const val DEFAULT_INT_VALUE = 0
-
-
-class MessageInputStyle(context: Context, attrs: AttributeSet) : Style(context, attrs) {
+class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs) {
     
     private var showAttachmentButton = false
     private var showEmojiButton = false
@@ -86,8 +84,8 @@ class MessageInputStyle(context: Context, attrs: AttributeSet) : Style(context, 
         fun parse(
             context: Context,
             attrs: AttributeSet
-        ): MessageInputStyle {
-            val style = MessageInputStyle(context, attrs)
+        ): ChatBoxStyle {
+            val style = ChatBoxStyle(context, attrs)
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MessageInput)
             style.showAttachmentButton =
                 typedArray.getBoolean(R.styleable.MessageInput_showAttachmentButton, false)

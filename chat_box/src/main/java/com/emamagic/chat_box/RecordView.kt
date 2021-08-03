@@ -12,29 +12,30 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import com.emamagic.chat_box.Const.DEFAULT_CANCEL_BOUNDS
 import io.supercharge.shimmerlayout.ShimmerLayout
 import java.io.IOException
 
 class RecordView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : RelativeLayout(context, attrs) {
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    val DEFAULT_CANCEL_BOUNDS = 8 //8dp
-
-    private var smallBlinkingMic: ImageView? = null
-    private  var basketImg:android.widget.ImageView? = null
+    private lateinit var smallBlinkingMic: ImageView
+    private lateinit var basketImg: ImageView
     private var counterTime: Chronometer? = null
-    private var slideToCancel: TextView? = null
-    private var slideToCancelLayout: ShimmerLayout? = null
-    private var arrow: ImageView? = null
-    private var initialX =
-        0f, private  var basketInitialY:kotlin.Float = 0f, private  var difX:kotlin.Float = 0f
+    private lateinit var slideToCancel: TextView
+    private lateinit var slideToCancelLayout: ShimmerLayout
+    private lateinit var arrow: ImageView
+    private var initialX = 0f
+    private var basketInitialY = 0f
+    private var difX = 0f
     private var cancelBounds = DEFAULT_CANCEL_BOUNDS.toFloat()
-    private var startTime: Long = 0, private  var elapsedTime:kotlin.Long = 0
-    private var context: Context? = null
+    private var startTime: Long = 0
+    private var elapsedTime: Long = 0
     private var recordListener: OnRecordListener? = null
     private var recordPermissionHandler: RecordPermissionHandler? = null
-    private var isSwiped = false, private  var isLessThanSecondAllowed:kotlin.Boolean = false
+    private var isSwiped = false
+    private var isLessThanSecondAllowed: Boolean = false
     private var isSoundEnabled = true
     private var RECORD_START: Int = R.raw.record_start
     private var RECORD_FINISHED: Int = R.raw.record_finished
@@ -44,29 +45,17 @@ class RecordView @JvmOverloads constructor(
     private var isRecordButtonGrowingAnimationEnabled = true
     private var shimmerEffectEnabled = true
     private var timeLimit: Long = -1
-    private var runnable: Runnable? = null
-    private var handler: Handler? = null
-    private var recordButton: com.emamagic.record_view.RecordButton? = null
-
+    private lateinit var runnable: Runnable
+    private lateinit var recordButton: RecordButton
+    private var mHandler: Handler? = null
     private var canRecord = true
 
-    fun RecordView(context: Context) {
-        super(context)
-        this.context = context
-        init(context, null, -1, -1)
-    }
-
-
-    fun RecordView(context: Context, attrs: AttributeSet?) {
-        super(context, attrs)
-        this.context = context
-        init(context, attrs, -1, -1)
-    }
-
-    fun RecordView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
-        super(context, attrs, defStyleAttr)
-        this.context = context
-        init(context, attrs, defStyleAttr, -1)
+    init {
+        when {
+            attrs == null -> { init(context, null, -1, -1) }
+            defStyleAttr == 0 -> { init(context, attrs, -1, -1) }
+            else -> { init(context, attrs, defStyleAttr, -1) }
+        }
     }
 
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -78,7 +67,7 @@ class RecordView @JvmOverloads constructor(
         slideToCancel = view.findViewById(R.id.slide_to_cancel)
         smallBlinkingMic = view.findViewById(R.id.glowing_mic)
         counterTime = view.findViewById(R.id.counter_tv)
-        basketImg = view.findViewById<ImageView>(R.id.basket_img)
+        basketImg = view.findViewById(R.id.basket_img)
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout)
         hideViews(true)
         if (attrs != null && defStyleAttr == -1 && defStyleRes == -1) {
@@ -107,7 +96,7 @@ class RecordView @JvmOverloads constructor(
                 val slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource)
                 arrow.setImageDrawable(slideArrow)
             }
-            if (slideToCancelText != null) slideToCancel.setText(slideToCancelText)
+            if (slideToCancelText != null) slideToCancel.text = slideToCancelText
             if (counterTimeColor != -1) setCounterTimeColor(counterTimeColor)
             if (arrowColor != -1) setSlideToCancelArrowColor(arrowColor)
             setMarginRight(slideMarginRight, true)
@@ -126,30 +115,28 @@ class RecordView @JvmOverloads constructor(
     }
 
     private fun initTimeLimitHandler() {
-        handler = Handler()
+        mHandler = Handler()
         runnable = Runnable {
-            if (recordListener != null && !isSwiped) recordListener.onFinish(elapsedTime, true)
+            if (recordListener != null && !isSwiped) recordListener?.onFinish(elapsedTime, true)
             removeTimeLimitCallbacks()
-            animationHelper.setStartRecorded(false)
+            animationHelper?.setStartRecorded(false)
             if (!isSwiped) playSound(RECORD_FINISHED)
-            if (recordButton != null) {
-                resetRecord(recordButton)
-            }
+            resetRecord(recordButton)
             isSwiped = true
         }
     }
 
 
     private fun hideViews(hideSmallMic: Boolean) {
-        slideToCancelLayout.setVisibility(GONE)
-        counterTime!!.visibility = GONE
-        if (hideSmallMic) smallBlinkingMic!!.visibility = GONE
+        slideToCancelLayout.visibility = GONE
+        counterTime?.visibility = GONE
+        if (hideSmallMic) smallBlinkingMic.visibility = GONE
     }
 
     private fun showViews() {
-        slideToCancelLayout.setVisibility(VISIBLE)
-        smallBlinkingMic!!.visibility = VISIBLE
-        counterTime!!.visibility = VISIBLE
+        slideToCancelLayout.visibility = VISIBLE
+        smallBlinkingMic.visibility = VISIBLE
+        counterTime?.visibility = VISIBLE
     }
 
 
@@ -163,13 +150,13 @@ class RecordView @JvmOverloads constructor(
             if (soundRes == 0) return
             try {
                 player = MediaPlayer()
-                val afd = context!!.resources.openRawResourceFd(soundRes) ?: return
-                player!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                val afd = context?.resources?.openRawResourceFd(soundRes) ?: return
+                player?.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                 afd.close()
-                player!!.prepare()
-                player!!.start()
-                player!!.setOnCompletionListener { mp -> mp.release() }
-                player!!.isLooping = false
+                player?.prepare()
+                player?.start()
+                player?.setOnCompletionListener { mp -> mp.release() }
+                player?.isLooping = false
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -177,38 +164,38 @@ class RecordView @JvmOverloads constructor(
     }
 
 
-    fun onActionDown(recordBtn: com.emamagic.record_view.RecordButton, motionEvent: MotionEvent?) {
+    fun onActionDown(recordBtn: RecordButton, motionEvent: MotionEvent) {
         if (!isRecordPermissionGranted()) {
             return
         }
         recordButton = recordBtn
-        if (recordListener != null) recordListener.onStart()
+        if (recordListener != null) recordListener?.onStart()
         if (isTimeLimitValid()) {
             removeTimeLimitCallbacks()
-            handler!!.postDelayed(runnable!!, timeLimit)
+            mHandler?.postDelayed(runnable, timeLimit)
         }
-        animationHelper.setStartRecorded(true)
-        animationHelper.resetBasketAnimation()
-        animationHelper.resetSmallMic()
+        animationHelper?.setStartRecorded(true)
+        animationHelper?.resetBasketAnimation()
+        animationHelper?.resetSmallMic()
         if (isRecordButtonGrowingAnimationEnabled) {
             recordBtn.startScale()
         }
         if (shimmerEffectEnabled) {
             slideToCancelLayout.startShimmerAnimation()
         }
-        initialX = recordBtn.getX()
-        basketInitialY = basketImg.getY() + 90
+        initialX = recordBtn.x
+        basketInitialY = basketImg.y + 90
         playSound(RECORD_START)
         showViews()
-        animationHelper.animateSmallMicAlpha()
-        counterTime!!.base = SystemClock.elapsedRealtime()
+        animationHelper?.animateSmallMicAlpha()
+        counterTime?.base = SystemClock.elapsedRealtime()
         startTime = System.currentTimeMillis()
-        counterTime!!.start()
+        counterTime?.start()
         isSwiped = false
     }
 
 
-    fun onActionMove(recordBtn: com.emamagic.record_view.RecordButton, motionEvent: MotionEvent) {
+    fun onActionMove(recordBtn: RecordButton, motionEvent: MotionEvent) {
         if (!canRecord) {
             return
         }
@@ -216,30 +203,30 @@ class RecordView @JvmOverloads constructor(
         if (!isSwiped) {
 
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0f && slideToCancelLayout.getX() <= counterTime!!.right + cancelBounds) {
+            if (slideToCancelLayout.x != 0f && slideToCancelLayout.x <= counterTime?.right!! + cancelBounds) {
 
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
                     hideViews(true)
-                    animationHelper.clearAlphaAnimation(false)
-                    animationHelper.onAnimationEnd()
+                    animationHelper?.clearAlphaAnimation(false)
+                    animationHelper?.onAnimationEnd()
                 } else {
                     hideViews(false)
-                    animationHelper.animateBasket(basketInitialY)
+                    animationHelper?.animateBasket(basketInitialY)
                 }
-                animationHelper.moveRecordButtonAndSlideToCancelBack(
+                animationHelper?.moveRecordButtonAndSlideToCancelBack(
                     recordBtn,
                     slideToCancelLayout,
                     initialX,
                     difX
                 )
-                counterTime!!.stop()
+                counterTime?.stop()
                 if (shimmerEffectEnabled) {
                     slideToCancelLayout.stopShimmerAnimation()
                 }
                 isSwiped = true
-                animationHelper.setStartRecorded(false)
-                if (recordListener != null) recordListener.onCancel()
+                animationHelper?.setStartRecorded(false)
+                if (recordListener != null) recordListener?.onCancel()
                 if (isTimeLimitValid()) {
                     removeTimeLimitCallbacks()
                 }
@@ -252,7 +239,7 @@ class RecordView @JvmOverloads constructor(
                         .x(motionEvent.rawX)
                         .setDuration(0)
                         .start()
-                    if (difX == 0f) difX = initialX - slideToCancelLayout.getX()
+                    if (difX == 0f) difX = initialX - slideToCancelLayout.x
                     slideToCancelLayout.animate()
                         .x(motionEvent.rawX - difX)
                         .setDuration(0)
@@ -262,36 +249,36 @@ class RecordView @JvmOverloads constructor(
         }
     }
 
-    fun onActionUp(recordBtn: com.emamagic.record_view.RecordButton?) {
+    fun onActionUp(recordBtn: RecordButton) {
         if (!canRecord) {
             return
         }
         elapsedTime = System.currentTimeMillis() - startTime
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
-            if (recordListener != null) recordListener.onLessThanSecond()
+            if (recordListener != null) recordListener?.onLessThanSecond()
             removeTimeLimitCallbacks()
-            animationHelper.setStartRecorded(false)
+            animationHelper?.setStartRecorded(false)
             playSound(RECORD_ERROR)
         } else {
-            if (recordListener != null && !isSwiped) recordListener.onFinish(elapsedTime, false)
+            if (recordListener != null && !isSwiped) recordListener?.onFinish(elapsedTime, false)
             removeTimeLimitCallbacks()
-            animationHelper.setStartRecorded(false)
+            animationHelper?.setStartRecorded(false)
             if (!isSwiped) playSound(RECORD_FINISHED)
         }
         resetRecord(recordBtn)
     }
 
-    private fun resetRecord(recordBtn: com.emamagic.record_view.RecordButton?) {
+    private fun resetRecord(recordBtn: RecordButton) {
         //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
         hideViews(!isSwiped)
-        if (!isSwiped) animationHelper.clearAlphaAnimation(true)
-        animationHelper.moveRecordButtonAndSlideToCancelBack(
+        if (!isSwiped) animationHelper?.clearAlphaAnimation(true)
+        animationHelper?.moveRecordButtonAndSlideToCancelBack(
             recordBtn,
             slideToCancelLayout,
             initialX,
             difX
         )
-        counterTime!!.stop()
+        counterTime?.stop()
         if (shimmerEffectEnabled) {
             slideToCancelLayout.stopShimmerAnimation()
         }
@@ -299,7 +286,7 @@ class RecordView @JvmOverloads constructor(
 
     private fun removeTimeLimitCallbacks() {
         if (isTimeLimitValid()) {
-            handler!!.removeCallbacks(runnable!!)
+            mHandler?.removeCallbacks(runnable)
         }
     }
 
@@ -308,16 +295,16 @@ class RecordView @JvmOverloads constructor(
         if (recordPermissionHandler == null) {
             canRecord = true
         }
-        canRecord = recordPermissionHandler.isPermissionGranted()
+        canRecord = recordPermissionHandler?.isPermissionGranted() == true
         return canRecord
     }
 
     private fun setMarginRight(marginRight: Int, convertToDp: Boolean) {
-        val layoutParams = slideToCancelLayout.getLayoutParams() as LayoutParams
+        val layoutParams = slideToCancelLayout.layoutParams as LayoutParams
         if (convertToDp) {
-            layoutParams.rightMargin = DpUtil.toPixel(marginRight.toFloat(), context)
+            layoutParams.rightMargin = Utility.toPixel(marginRight.toFloat(), context).toInt()
         } else layoutParams.rightMargin = marginRight
-        slideToCancelLayout.setLayoutParams(layoutParams)
+        slideToCancelLayout.layoutParams = layoutParams
     }
 
 
@@ -329,8 +316,8 @@ class RecordView @JvmOverloads constructor(
         this.recordPermissionHandler = recordPermissionHandler
     }
 
-    fun setOnBasketAnimationEndListener(onBasketAnimationEndListener: OnBasketAnimationEnd?) {
-        animationHelper.setOnBasketAnimationEndListener(onBasketAnimationEndListener)
+    fun setOnBasketAnimationEndListener(onBasketAnimationEndListener: OnBasketAnimationEnd) {
+        animationHelper?.setOnBasketAnimationEndListener(onBasketAnimationEndListener)
     }
 
     fun setSoundEnabled(isEnabled: Boolean) {
@@ -342,19 +329,19 @@ class RecordView @JvmOverloads constructor(
     }
 
     fun setSlideToCancelText(text: String?) {
-        slideToCancel!!.text = text
+        slideToCancel.text = text
     }
 
     fun setSlideToCancelTextColor(color: Int) {
-        slideToCancel!!.setTextColor(color)
+        slideToCancel.setTextColor(color)
     }
 
     fun setSmallMicColor(color: Int) {
-        smallBlinkingMic!!.setColorFilter(color)
+        smallBlinkingMic.setColorFilter(color)
     }
 
     fun setSmallMicIcon(icon: Int) {
-        smallBlinkingMic!!.setImageResource(icon)
+        smallBlinkingMic.setImageResource(icon)
     }
 
     fun setSlideMarginRight(marginRight: Int) {
@@ -379,11 +366,11 @@ class RecordView @JvmOverloads constructor(
 
     //set Chronometer color
     fun setCounterTimeColor(color: Int) {
-        counterTime!!.setTextColor(color)
+        counterTime?.setTextColor(color)
     }
 
     fun setSlideToCancelArrowColor(color: Int) {
-        arrow!!.setColorFilter(color)
+        arrow.setColorFilter(color)
     }
 
 
@@ -398,7 +385,7 @@ class RecordView @JvmOverloads constructor(
 
     fun setRecordButtonGrowingAnimationEnabled(recordButtonGrowingAnimationEnabled: Boolean) {
         isRecordButtonGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled
-        animationHelper.setRecordButtonGrowingAnimationEnabled(recordButtonGrowingAnimationEnabled)
+        animationHelper?.setRecordButtonGrowingAnimationEnabled(recordButtonGrowingAnimationEnabled)
     }
 
     fun isShimmerEffectEnabled(): Boolean {
@@ -415,14 +402,14 @@ class RecordView @JvmOverloads constructor(
 
     fun setTimeLimit(timeLimit: Long) {
         this.timeLimit = timeLimit
-        if (handler != null && runnable != null) {
+        if (mHandler != null) {
             removeTimeLimitCallbacks()
         }
         initTimeLimitHandler()
     }
 
     fun setTrashIconColor(color: Int) {
-        animationHelper.setTrashIconColor(color)
+        animationHelper?.setTrashIconColor(color)
     }
 
 }
