@@ -18,20 +18,14 @@ class RecordButton @JvmOverloads constructor(
     private lateinit var onRecordClickListener: OnRecordClickListener
     private var listenForRecord = true
 
-    init { init(context, attrs) }
+    init { init() }
 
     fun setRecordView(recordView: RecordView) {
         this.recordView = recordView
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun init(context: Context, attrs: AttributeSet?) {
-        if (attrs != null) {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton)
-            val imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1)
-            if (imageResource != -1) { setTheImageResource(imageResource) }
-            typedArray.recycle()
-        }
+    private fun init() {
         scaleAnim = ScaleAnim(this)
         this.setOnTouchListener(this)
         this.setOnClickListener(this)
@@ -56,7 +50,7 @@ class RecordButton @JvmOverloads constructor(
     }
 
 
-    private fun setTheImageResource(imageResource: Int) {
+    fun setTheImageResource(imageResource: Int) {
         val image = AppCompatResources.getDrawable(context, imageResource)
         setImageDrawable(image)
     }

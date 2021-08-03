@@ -27,15 +27,32 @@
         android:layout_centerVertical="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/attachmentButton"
-        app:layout_constraintStart_toEndOf="@id/messageSendButton"
+        app:layout_constraintStart_toEndOf="@id/sendButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@id/messageSendButton"
+        android:id="@id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.emamagic.chat_box.RecordButton
+        android:id="@id/recordButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include android:id="@+id/record_view"
+        layout="@layout/record_view_layout"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

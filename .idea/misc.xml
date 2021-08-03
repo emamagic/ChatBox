@@ -11,6 +11,7 @@
         <entry key="chat_box/src/main/res/drawable/recv_basket_animated.xml" value="0.35333333333333333" />
         <entry key="chat_box/src/main/res/drawable/recv_ic_delete.xml" value="0.35333333333333333" />
         <entry key="chat_box/src/main/res/drawable/recv_ic_mic.xml" value="0.35333333333333333" />
+        <entry key="chat_box/src/main/res/layout/chat_box_layout.xml" value="0.34270833333333334" />
         <entry key="chat_box/src/main/res/layout/record_view_layout.xml" value="0.34270833333333334" />
         <entry key="chat_box/src/main/res/layout/view_message_input.xml" value="0.34270833333333334" />
         <entry key="message_input/src/main/res/drawable/btn_rounded_green.xml" value="0.24351851851851852" />

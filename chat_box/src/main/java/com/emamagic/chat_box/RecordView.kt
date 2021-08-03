@@ -1,5 +1,6 @@
 package com.emamagic.chat_box
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Handler
@@ -13,11 +14,12 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import com.emamagic.chat_box.Const.DEFAULT_CANCEL_BOUNDS
+import com.emamagic.chat_box.Const.DEFAULT_VALUE
 import io.supercharge.shimmerlayout.ShimmerLayout
 import java.io.IOException
 
 class RecordView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = DEFAULT_VALUE
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private lateinit var smallBlinkingMic: ImageView
@@ -52,12 +54,13 @@ class RecordView @JvmOverloads constructor(
 
     init {
         when {
-            attrs == null -> { init(context, null, -1, -1) }
-            defStyleAttr == 0 -> { init(context, attrs, -1, -1) }
-            else -> { init(context, attrs, defStyleAttr, -1) }
+            attrs == null -> { init(context, null, DEFAULT_VALUE, DEFAULT_VALUE) }
+            defStyleAttr == 0 -> { init(context, attrs, DEFAULT_VALUE, DEFAULT_VALUE) }
+            else -> { init(context, attrs, defStyleAttr, DEFAULT_VALUE) }
         }
     }
 
+    @SuppressLint("CustomViewStyleable")
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         val view = inflate(context, R.layout.record_view_layout, null)
         addView(view)
@@ -70,36 +73,28 @@ class RecordView @JvmOverloads constructor(
         basketImg = view.findViewById(R.id.basket_img)
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout)
         hideViews(true)
-        if (attrs != null && defStyleAttr == -1 && defStyleRes == -1) {
+        if (attrs != null && defStyleAttr == DEFAULT_VALUE && defStyleRes == DEFAULT_VALUE) {
             val typedArray = context.obtainStyledAttributes(
-                attrs, R.styleable.RecordView,
+                attrs, R.styleable.ChatBox,
                 defStyleAttr, defStyleRes
             )
             val slideArrowResource =
-                typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1)
+                typedArray.getResourceId(R.styleable.ChatBox_slideToCancelArrow, DEFAULT_VALUE)
             val slideToCancelText =
-                typedArray.getString(R.styleable.RecordView_slide_to_cancel_text)
-            val slideMarginRight =
-                typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_right, 30f)
-                    .toInt()
-            val counterTimeColor =
-                typedArray.getColor(R.styleable.RecordView_counter_time_color, -1)
-            val arrowColor =
-                typedArray.getColor(R.styleable.RecordView_slide_to_cancel_arrow_color, -1)
+                typedArray.getString(R.styleable.ChatBox_slideToCancelText)
+
             val cancelBounds =
-                typedArray.getDimensionPixelSize(R.styleable.RecordView_slide_to_cancel_bounds, -1)
-            if (cancelBounds != -1) setCancelBounds(
+                typedArray.getDimensionPixelSize(R.styleable.ChatBox_slideToCancelBounds, DEFAULT_CANCEL_BOUNDS)
+            if (cancelBounds != DEFAULT_VALUE) setCancelBounds(
                 cancelBounds.toFloat(),
                 false
             ) //don't convert it to pixels since it's already in pixels
-            if (slideArrowResource != -1) {
+            if (slideArrowResource != DEFAULT_VALUE) {
                 val slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource)
                 arrow.setImageDrawable(slideArrow)
             }
             if (slideToCancelText != null) slideToCancel.text = slideToCancelText
-            if (counterTimeColor != -1) setCounterTimeColor(counterTimeColor)
-            if (arrowColor != -1) setSlideToCancelArrowColor(arrowColor)
-            setMarginRight(slideMarginRight, true)
+
             typedArray.recycle()
         }
         animationHelper = AnimationHelper(

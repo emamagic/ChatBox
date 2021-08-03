@@ -7,13 +7,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.view.ViewCompat
 
 class ChatBox @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -28,8 +26,6 @@ class ChatBox @JvmOverloads constructor(
 
     private lateinit var chatBoxStyle: ChatBoxStyle
     private var showAttachmentButton = false
-    private var delayTypingStatusMillis = 0
-    private var delaySavingDraftInMillis = 0
 
     init {
         initViews(context)
@@ -38,10 +34,11 @@ class ChatBox @JvmOverloads constructor(
 
     @SuppressLint("WrongConstant", "ClickableViewAccessibility")
     private fun initViews(context: Context) {
-        inflate(context, R.layout.view_message_input, this)
+        inflate(context, R.layout.chat_box_layout, this)
         orientation = LinearLayout.VERTICAL
         messageInput = findViewById(R.id.messageInput)
-        messageSendButton = findViewById(R.id.messageSendButton)
+        messageSendButton = findViewById(R.id.sendButton)
+        recordButton = findViewById(R.id.recordButton)
         emojiButton = findViewById(R.id.emojiButton)
         attachmentButton = findViewById(R.id.attachmentButton)
     }
@@ -52,13 +49,13 @@ class ChatBox @JvmOverloads constructor(
         messageInput.hint = chatBoxStyle.getInputHint()
         if (chatBoxStyle.getInputText().isNotEmpty()) {
             messageInput.setText(chatBoxStyle.getInputText())
-            messageSendButton.setImageDrawable(chatBoxStyle.getInputButtonIcon())
+            messageSendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
         } else {
-            if (chatBoxStyle.isShowMicIcon()) {
-                messageSendButton.setImageDrawable(chatBoxStyle.getInputVoiceIcon())
+            if (chatBoxStyle.isShowingRecordButton()) {
+                messageSendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
             } else {
                 messageSendButton.isEnabled = false
-                messageSendButton.setImageDrawable(chatBoxStyle.getInputButtonIcon())
+                messageSendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
                 messageSendButton.visibility = INVISIBLE
             }
         }
@@ -68,29 +65,20 @@ class ChatBox @JvmOverloads constructor(
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-        ViewCompat.setBackground(messageInput, chatBoxStyle.getInputBackground())
-        Utility.setCursor(chatBoxStyle.getInputCursorDrawable(), messageInput)
-        showAttachmentButton = chatBoxStyle.showAttachmentButton()
+        showAttachmentButton = chatBoxStyle.isShowingAttachmentButton()
         attachmentButton.visibility = if (showAttachmentButton) VISIBLE else GONE
         attachmentButton.setImageDrawable(chatBoxStyle.getAttachmentButtonIcon())
-        ViewCompat.setBackground(
-            attachmentButton,
-            chatBoxStyle.getAttachmentButtonBackground()
-        )
-        emojiButton.visibility = if (chatBoxStyle.showEmojiButton()) VISIBLE else GONE
+        emojiButton.visibility = if (chatBoxStyle.isShowingEmojiButton()) VISIBLE else GONE
         emojiButton.setImageDrawable(chatBoxStyle.getEmojiButtonIcon())
-        ViewCompat.setBackground(emojiButton, chatBoxStyle.getEmojiButtonBackground())
-        ViewCompat.setBackground(messageSendButton, chatBoxStyle.getInputButtonBackground())
-        this.delayTypingStatusMillis = chatBoxStyle.getDelayTypingStatus()
-        this.delaySavingDraftInMillis = chatBoxStyle.getDelaySavingDraft()
+        recordButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
     }
 
     override fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) {}
     override fun afterTextChanged(p0: Editable?) {}
     override fun onTextChanged(s: CharSequence, p1: Int, p2: Int, p3: Int) {
         if (s.isEmpty()) {
-            if (chatBoxStyle.isShowMicIcon()) {
-                messageSendButton.setImageDrawable(chatBoxStyle.getInputVoiceIcon())
+            if (chatBoxStyle.isShowingRecordButton()) {
+                messageSendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
             } else {
                 messageSendButton.isEnabled = false
                 messageSendButton.visibility = INVISIBLE
