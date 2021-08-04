@@ -29,9 +29,6 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
     private var showRecordButton = false
     private var recordButtonIcon = DEFAULT_VALUE
 
-    private var slideToCancelText: String = ""
-    private var slideToCancelBounds = DEFAULT_VALUE
-    private var slideToCancelArrow = DEFAULT_VALUE
 
     companion object {
         @JvmStatic
@@ -90,6 +87,7 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 typedArray.getResourceId(R.styleable.ChatBox_recordButtonIcon, DEFAULT_VALUE)
 
             typedArray.recycle()
+
             return style
         }
     }
@@ -103,19 +101,19 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
         return inputMaxLines
     }
 
-     fun getInputHint(): String {
+    fun getInputHint(): String {
         return inputHint
     }
 
-     fun getInputTextSize(): Int {
+    fun getInputTextSize(): Int {
         return inputTextSize
     }
 
-     fun getInputTextColor(): Int {
+    fun getInputTextColor(): Int {
         return inputTextColor
     }
 
-     fun getInputHintColor(): Int {
+    fun getInputHintColor(): Int {
         return inputHintColor
     }
 
@@ -132,7 +130,14 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
         return showRecordButton
     }
 
-     fun getAttachmentButtonIcon(): Drawable? {
+    fun getDefaultIconBackground(): Drawable {
+        return getSelector(
+            getColor(R.color.white), getColor(R.color.white),
+            getColor(R.color.white), R.drawable.mask
+        )
+    }
+
+    fun getAttachmentButtonIcon(): Drawable? {
         return if (attachmentButtonIcon == DEFAULT_VALUE) {
             getSelector(
                 getColor(R.color.warm_grey), getColor(R.color.colorPrimaryDark),
@@ -143,7 +148,8 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
         }
     }
 
-     fun getEmojiButtonIcon(): Drawable? {
+
+    fun getEmojiButtonIcon(): Drawable? {
         return if (emojiButtonIcon == DEFAULT_VALUE) {
             getSelector(
                 getColor(R.color.warm_grey), getColor(R.color.colorPrimaryDark),
@@ -154,7 +160,7 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
         }
     }
 
-     fun getSendButtonIcon(): Drawable? {
+    fun getSendButtonIcon(): Drawable? {
         return if (sendButtonIcon == DEFAULT_VALUE) {
             getSelector(
                 getColor(R.color.warm_grey), getColor(R.color.colorPrimaryDark),
@@ -165,7 +171,7 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
         }
     }
 
-     fun getRecordButtonIcon(): Drawable? {
+    fun getRecordButtonIcon(): Drawable? {
         return if (recordButtonIcon == DEFAULT_VALUE) {
             getSelector(
                 getColor(R.color.warm_grey), getColor(R.color.colorPrimaryDark),
@@ -175,4 +181,5 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
             getDrawable(recordButtonIcon)
         }
     }
+
 }

@@ -21,7 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layoutDirection="ltr"
         app:showAttachmentButton="true"
+        app:inputHint="write your message"
         app:showEmojiButton="true" />
 
 

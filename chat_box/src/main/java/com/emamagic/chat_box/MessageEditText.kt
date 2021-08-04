@@ -9,8 +9,8 @@ import com.emamagic.emoji.view.EmojiMultiAutoCompleteTextView
 import java.lang.Exception
 
 class MessageEditText @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : EmojiMultiAutoCompleteTextView(context, attrs, defStyleAttr) {
+    context: Context, attrs: AttributeSet? = null
+) : EmojiMultiAutoCompleteTextView(context, attrs) {
 
 
     init { init() }
