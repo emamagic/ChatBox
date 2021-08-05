@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import com.emamagic.chat_box.Const.CHAT_BOX_ICON_DEFAULT_VISIBILITY
 import com.emamagic.chat_box.Const.DEFAULT_CANCEL_BOUNDS
+import com.emamagic.chat_box.Const.DEFAULT_DELAY_TYPING_STATUS
 import com.emamagic.chat_box.Const.DEFAULT_VALUE
 import com.emamagic.chat_box.Const.DEFAULT_MAX_LINES
 
@@ -30,6 +31,8 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
     private var showRecordButton = CHAT_BOX_ICON_DEFAULT_VISIBILITY
     private var recordButtonIcon = DEFAULT_VALUE
 
+    private var delayTypingStatus = DEFAULT_DELAY_TYPING_STATUS
+
 
     companion object {
         @JvmStatic
@@ -44,13 +47,19 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 typedArray.getResourceId(R.styleable.ChatBox_sendButtonIcon, DEFAULT_VALUE)
 
             style.showAttachmentButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showAttachmentButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
+                typedArray.getBoolean(
+                    R.styleable.ChatBox_showAttachmentButton,
+                    CHAT_BOX_ICON_DEFAULT_VISIBILITY
+                )
 
             style.attachmentButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_attachmentButtonIcon, DEFAULT_VALUE)
 
             style.showEmojiButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showEmojiButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
+                typedArray.getBoolean(
+                    R.styleable.ChatBox_showEmojiButton,
+                    CHAT_BOX_ICON_DEFAULT_VISIBILITY
+                )
 
             style.emojiButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_emojiButtonIcon, DEFAULT_VALUE)
@@ -63,7 +72,8 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 DEFAULT_MAX_LINES
             )
 
-            style.inputHint = typedArray.getString(R.styleable.ChatBox_inputHint) ?: style.getString(R.string.chat_box_hint)
+            style.inputHint = typedArray.getString(R.styleable.ChatBox_inputHint)
+                ?: style.getString(R.string.chat_box_hint)
 
             style.inputTextSize = typedArray.getDimensionPixelSize(
                 R.styleable.ChatBox_inputTextSize,
@@ -79,10 +89,18 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
             )
 
             style.showRecordButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showRecordButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
+                typedArray.getBoolean(
+                    R.styleable.ChatBox_showRecordButton,
+                    CHAT_BOX_ICON_DEFAULT_VISIBILITY
+                )
 
             style.recordButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_recordButtonIcon, DEFAULT_VALUE)
+
+            style.delayTypingStatus = typedArray.getInt(
+                R.styleable.ChatBox_delayTypingStatus,
+                DEFAULT_DELAY_TYPING_STATUS
+            )
 
             typedArray.recycle()
 
@@ -126,6 +144,10 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
 
     fun isShowingRecordButton(): Boolean {
         return showRecordButton
+    }
+
+    fun getDelayTypingStatus(): Int {
+        return delayTypingStatus
     }
 
     fun getDefaultIconBackground(): Drawable {

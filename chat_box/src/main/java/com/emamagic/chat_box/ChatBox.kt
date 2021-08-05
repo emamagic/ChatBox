@@ -29,15 +29,27 @@ class ChatBox @JvmOverloads constructor(
     private lateinit var recordButton: RecordButton
     private lateinit var chatBoxStyle: ChatBoxStyle
     private var attachmentTypeSelector: AttachmentTypeSelector? = null
+    private var delayTypingStatusMillis = 0
     private var input: String = ""
+    private var isTyping: Boolean = false
     private lateinit var activity: Activity
 
     private var attachmentsListener: AttachmentsListener? = null
     private var inputListener: InputListener? = null
+    private var typingListener: TypingListener? = null
+
+    private var typingTimerRunnable = Runnable {
+        if (isTyping) {
+            isTyping = false
+            typingListener?.onStopTyping()
+        }
+    }
 
     init {
         initViews(context)
-        if (attrs != null) { initStyles(context, attrs) }
+        if (attrs != null) {
+            initStyles(context, attrs)
+        }
     }
 
     @SuppressLint("WrongConstant", "ClickableViewAccessibility")
@@ -68,11 +80,13 @@ class ChatBox @JvmOverloads constructor(
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-        attachmentButton.visibility = if (chatBoxStyle.isShowingAttachmentButton()) VISIBLE else GONE
+        attachmentButton.visibility =
+            if (chatBoxStyle.isShowingAttachmentButton()) VISIBLE else GONE
         attachmentButton.setImageDrawable(chatBoxStyle.getAttachmentButtonIcon())
         emojiButton.visibility = if (chatBoxStyle.isShowingEmojiButton()) VISIBLE else GONE
         emojiButton.setImageDrawable(chatBoxStyle.getEmojiButtonIcon())
         recordButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+        delayTypingStatusMillis = chatBoxStyle.getDelayTypingStatus()
         ViewCompat.setBackground(
             attachmentButton,
             chatBoxStyle.getDefaultIconBackground()
@@ -110,6 +124,7 @@ class ChatBox @JvmOverloads constructor(
                 sendButton.visibility = View.GONE
             }
         } else {
+            startTyping()
             sendButton.visibility = View.VISIBLE
             attachmentButton.visibility = View.GONE
             sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
@@ -118,8 +133,10 @@ class ChatBox @JvmOverloads constructor(
 
 
     override fun onClick(view: View) {
-        when(view.id) {
-            R.id.sendButton -> { inputListener?.onSubmit(input) }
+        when (view.id) {
+            R.id.sendButton -> {
+                inputListener?.onSubmit(input)
+            }
             R.id.attachmentButton -> {
                 if (attachmentsListener == null) {
                     if (attachmentTypeSelector == null) {
@@ -133,6 +150,19 @@ class ChatBox @JvmOverloads constructor(
         }
     }
 
+
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
+
+    }
+
+    private fun startTyping() {
+        if (!isTyping) {
+            isTyping = true
+            typingListener?.onStartTyping()
+        }
+        removeCallbacks(typingTimerRunnable)
+        postDelayed(typingTimerRunnable, delayTypingStatusMillis.toLong())
+    }
 
     override fun onHideKeyboard(): Boolean {
         Utility.hideKeyboard(messageInput)
@@ -167,6 +197,9 @@ class ChatBox @JvmOverloads constructor(
         this.attachmentsListener = attachmentsListener
     }
 
+    fun setTypingListener(typingListener: TypingListener) {
+        this.typingListener = typingListener;
+    }
 
     interface InputListener {
         fun onSubmit(input: String)
@@ -180,9 +213,6 @@ class ChatBox @JvmOverloads constructor(
         fun onRecordFinish(time: String, uri: Uri)
     }
 
-    override fun onFocusChange(view: View, hasFocus: Boolean) {
-
-    }
     interface TypingListener {
         fun onStartTyping()
         fun onStopTyping()

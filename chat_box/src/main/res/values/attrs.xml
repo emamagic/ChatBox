@@ -23,6 +23,8 @@
         <attr name="slideToCancelText" format="string" />
         <attr name="slideToCancelBounds" format="dimension" />
         <attr name="slideToCancelArrow" format="reference" />
+
+        <attr name="delayTypingStatus" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="CircleColorImageView">

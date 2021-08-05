@@ -12,5 +12,6 @@ object Const {
     const val PICK_AUDIO_REQUEST_ID = 3
     const val PICK_CONTACT_REQUEST_ID = 4
 
+    const val DEFAULT_DELAY_TYPING_STATUS = 1000
 
 }
