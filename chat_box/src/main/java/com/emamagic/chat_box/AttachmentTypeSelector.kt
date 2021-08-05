@@ -12,11 +12,11 @@ import android.view.animation.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import com.emamagic.chat_box.Const.PICK_AUDIO_REQUEST_ID
-import com.emamagic.chat_box.Const.PICK_CONTACT_REQUEST_ID
-import com.emamagic.chat_box.Const.PICK_DOCUMENT_REQUEST_ID
-import com.emamagic.chat_box.Const.PICK_GALLERY_REQUEST_ID
 
+const val PICK_GALLERY_REQUEST_ID = 1
+const val PICK_DOCUMENT_REQUEST_ID = 2
+const val PICK_AUDIO_REQUEST_ID = 3
+const val PICK_CONTACT_REQUEST_ID = 4
 class AttachmentTypeSelector(context: Context, private val activity: Activity) :
     PopupWindow(context) {
     private val imageButton: ImageView

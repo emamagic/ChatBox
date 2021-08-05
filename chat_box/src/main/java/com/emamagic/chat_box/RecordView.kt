@@ -13,11 +13,11 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import com.emamagic.chat_box.Const.DEFAULT_CANCEL_BOUNDS
 import com.emamagic.chat_box.Const.DEFAULT_VALUE
 import io.supercharge.shimmerlayout.ShimmerLayout
 import java.io.IOException
 
+const val DEFAULT_CANCEL_BOUNDS = 8 //dp
 class RecordView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = DEFAULT_VALUE
 ) : RelativeLayout(context, attrs, defStyleAttr) {
@@ -88,7 +88,7 @@ class RecordView @JvmOverloads constructor(
             if (cancelBounds != DEFAULT_VALUE) setCancelBounds(
                 cancelBounds.toFloat(),
                 false
-            ) //don't convert it to pixels since it's already in pixels
+            )
             if (slideArrowResource != DEFAULT_VALUE) {
                 val slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource)
                 arrow.setImageDrawable(slideArrow)

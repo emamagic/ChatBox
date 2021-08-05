@@ -2,29 +2,85 @@
 <resources>
 
     <declare-styleable name="ChatBox">
-        <attr name="sendButtonIcon" format="reference" />
 
+        <!-- SEND BUTTON ICON -->
+        <attr name="sendButtonIcon" format="reference" />
+        <attr name="sendButtonIconColor" format="color|reference" />
+        <attr name="sendButtonIconPressedColor" format="color|reference" />
+        <attr name="sendButtonIconDisabledColor" format="color|reference" />
+        <!-- SEND BUTTON BACKGROUND -->
+        <attr name="sendButtonBackground" format="reference"/>
+        <attr name="sendButtonBgColor" format="color|reference"/>
+        <attr name="sendButtonBgPressedColor" format="color|reference"/>
+        <attr name="sendButtonBgDisabledColor" format="color|reference"/>
+        <!-- SEND BUTTON SIZE -->
+        <attr name="sendButtonMargin" format="dimension|reference" />
+        <attr name="sendButtonWidth" format="dimension|reference" />
+        <attr name="sendButtonHeight" format="dimension|reference" />
+
+        
+        <!-- ATTACHMENT BUTTON ICON -->
         <attr name="showAttachmentButton" format="boolean" />
         <attr name="attachmentButtonIcon" format="reference" />
+        <attr name="attachmentButtonIconColor" format="color|reference" />
+        <attr name="attachmentButtonIconPressedColor" format="color|reference" />
+        <attr name="attachmentButtonIconDisabledColor" format="color|reference" />
+        <!-- ATTACHMENT BUTTON BACKGROUND -->
+        <attr name="attachmentButtonBackground" format="reference" />
+        <attr name="attachmentButtonBgColor" format="color|reference" />
+        <attr name="attachmentButtonBgPressedColor" format="color|reference" />
+        <attr name="attachmentButtonBgDisabledColor" format="color|reference" />
+        <!-- ATTACHMENT BUTTON SIZE -->
+        <attr name="attachmentButtonMargin" format="dimension|reference" />
+        <attr name="attachmentButtonWidth" format="dimension|reference" />
+        <attr name="attachmentButtonHeight" format="dimension|reference" />
 
+        
+        <!-- EMOJI BUTTON ICON -->
         <attr name="showEmojiButton" format="boolean" />
         <attr name="emojiButtonIcon" format="reference" />
+        <attr name="emojiButtonIconColor" format="color|reference" />
+        <attr name="emojiButtonIconPressedColor" format="color|reference" />
+        <attr name="emojiButtonIconDisabledColor" format="color|reference" />
+        <!-- EMOJI BUTTON BACKGROUND -->
+        <attr name="emojiButtonBackground" format="reference" />
+        <attr name="emojiButtonBgColor" format="color|reference" />
+        <attr name="emojiButtonBgPressedColor" format="color|reference" />
+        <attr name="emojiButtonBgDisabledColor" format="color|reference" />
+        <!-- EMOJI BUTTON SIZE -->
+        <attr name="emojiButtonMargin" format="dimension|reference" />
+        <attr name="emojiButtonWidth" format="dimension|reference" />
+        <attr name="emojiButtonHeight" format="dimension|reference" />
 
+
+        <!-- INPUT TEXT -->
         <attr name="inputText" format="string" />
-        <attr name="inputMaxLines" format="integer" />
         <attr name="inputHint" format="string" />
+        <attr name="inputMaxLines" format="integer" />
         <attr name="inputTextSize" format="dimension|reference" />
         <attr name="inputTextColor" format="color|reference" />
         <attr name="inputHintColor" format="color|reference" />
+        <attr name="inputBackground" format="reference" />
+        <attr name="inputCursorDrawable" format="reference" />
 
+
+        <!-- RECORD BUTTON -->
         <attr name="showRecordButton" format="boolean" />
         <attr name="recordButtonIcon" format="reference" />
 
+
+        <!-- RECORDER VIEW -->
         <attr name="slideToCancelText" format="string" />
         <attr name="slideToCancelBounds" format="dimension" />
         <attr name="slideToCancelArrow" format="reference" />
+        <attr name="slideToCancelMarginRight" format="dimension" />
+        <attr name="slideToCancelArrowColor" format="color" />
+        <attr name="counterTimeColor" format="color" />
 
+        
+        <!-- TYPING STATUS -->
         <attr name="delayTypingStatus" format="integer" />
+
     </declare-styleable>
 
     <declare-styleable name="CircleColorImageView">

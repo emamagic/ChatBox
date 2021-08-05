@@ -3,19 +3,24 @@ package com.emamagic.chat_box
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.ViewCompat
 import com.emamagic.emoji.EmojIconActions
+import java.lang.Exception
+
+import androidx.constraintlayout.widget.ConstraintLayout
+
 
 class ChatBox @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -66,39 +71,69 @@ class ChatBox @JvmOverloads constructor(
 
     private fun initStyles(context: Context, attrs: AttributeSet) {
         chatBoxStyle = ChatBoxStyle.parse(context, attrs)
-        messageInput.maxLines = chatBoxStyle.getInputMaxLines()
-        messageInput.hint = chatBoxStyle.getInputHint()
-        sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
+
+        /* send */
+        ViewCompat.setBackground(
+            sendButton,
+            chatBoxStyle.getSendButtonBackground()
+        )
         if (chatBoxStyle.isShowingRecordButton()) {
             sendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
         } else {
             sendButton.visibility = View.GONE
         }
+        sendButton.layoutParams.width = chatBoxStyle.getSendButtonWidth()
+        sendButton.layoutParams.height = chatBoxStyle.getSendButtonHeight()
+        setMargin(sendButton, chatBoxStyle.getSendButtonMargin())
+
+
+        /* attachment */
+        attachmentButton.visibility =
+            if (chatBoxStyle.isShowingAttachmentButton()) VISIBLE else GONE
+        attachmentButton.setImageDrawable(chatBoxStyle.getAttachmentButtonIcon())
+        ViewCompat.setBackground(
+            attachmentButton,
+            chatBoxStyle.getAttachmentButtonBackground()
+        )
+        attachmentButton.layoutParams.width = chatBoxStyle.getAttachmentButtonWidth()
+        attachmentButton.layoutParams.height = chatBoxStyle.getAttachmentButtonHeight()
+        setMargin(attachmentButton, chatBoxStyle.getAttachmentButtonMargin())
+
+
+        /* emoji */
+        emojiButton.visibility = if (chatBoxStyle.isShowingEmojiButton()) VISIBLE else GONE
+        emojiButton.setImageDrawable(chatBoxStyle.getEmojiButtonIcon())
+        ViewCompat.setBackground(
+            emojiButton,
+            chatBoxStyle.getEmojiButtonBackground()
+        )
+        emojiButton.layoutParams.width = chatBoxStyle.getEmojiButtonWidth()
+        emojiButton.layoutParams.height = chatBoxStyle.getEmojiButtonHeight()
+        setMargin(emojiButton, chatBoxStyle.getEmojiButtonMargin())
+
+
+        /* input text */
+        messageInput.maxLines = chatBoxStyle.getInputMaxLines()
+        messageInput.hint = chatBoxStyle.getInputHint()
+        messageInput.setText(chatBoxStyle.getInputText())
+        setCursor(chatBoxStyle.getInputCursorDrawable())
+        ViewCompat.setBackground(messageInput, chatBoxStyle.getInputBackground())
         messageInput.setTextSize(
             TypedValue.COMPLEX_UNIT_PX,
             chatBoxStyle.getInputTextSize().toFloat()
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-        attachmentButton.visibility =
-            if (chatBoxStyle.isShowingAttachmentButton()) VISIBLE else GONE
-        attachmentButton.setImageDrawable(chatBoxStyle.getAttachmentButtonIcon())
-        emojiButton.visibility = if (chatBoxStyle.isShowingEmojiButton()) VISIBLE else GONE
-        emojiButton.setImageDrawable(chatBoxStyle.getEmojiButtonIcon())
+       setMargin(messageInput, chatBoxStyle.getEmojiButtonMargin())
+
+
+        /* record button */
         recordButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+
+        /* typing status */
         delayTypingStatusMillis = chatBoxStyle.getDelayTypingStatus()
-        ViewCompat.setBackground(
-            attachmentButton,
-            chatBoxStyle.getDefaultIconBackground()
-        )
-        ViewCompat.setBackground(
-            sendButton,
-            chatBoxStyle.getDefaultIconBackground()
-        )
-        ViewCompat.setBackground(
-            emojiButton,
-            chatBoxStyle.getDefaultIconBackground()
-        )
+
+
     }
 
     private fun setUpViews() {
@@ -129,6 +164,31 @@ class ChatBox @JvmOverloads constructor(
             attachmentButton.visibility = View.GONE
             sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
         }
+    }
+
+    @SuppressLint("DiscouragedPrivateApi")
+    private fun setCursor(drawable: Drawable?) {
+        if (drawable == null) return
+        try {
+            @SuppressLint("SoonBlockedPrivateApi") val drawableResField =
+                TextView::class.java.getDeclaredField("mCursorDrawableRes")
+            drawableResField.isAccessible = true
+            val drawableFieldOwner: Any
+            val drawableFieldClass: Class<*>
+            val editorField = TextView::class.java.getDeclaredField("mEditor")
+            editorField.isAccessible = true
+            drawableFieldOwner = editorField[messageInput]
+            drawableFieldClass = drawableFieldOwner.javaClass
+            val drawableField = drawableFieldClass.getDeclaredField("mCursorDrawable")
+            drawableField.isAccessible = true
+            drawableField[drawableFieldOwner] =
+                arrayOf(drawable, drawable)
+        } catch (ignored: Exception) {
+        }
+    }
+
+    private fun setMargin(view: View, margin: Int) {
+        (view.layoutParams as ConstraintLayout.LayoutParams).setMargins(margin, margin, margin, margin)
     }
 
 
