@@ -3,6 +3,7 @@ package com.emamagic.chat_box
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import com.emamagic.chat_box.Const.CHAT_BOX_ICON_DEFAULT_VISIBILITY
 import com.emamagic.chat_box.Const.DEFAULT_CANCEL_BOUNDS
 import com.emamagic.chat_box.Const.DEFAULT_VALUE
 import com.emamagic.chat_box.Const.DEFAULT_MAX_LINES
@@ -11,22 +12,22 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
 
     private var sendButtonIcon = DEFAULT_VALUE
 
-    private var showAttachmentButton = false
+    private var showAttachmentButton = CHAT_BOX_ICON_DEFAULT_VISIBILITY
     private var attachmentButtonIcon = DEFAULT_VALUE
 
-    private var showEmojiButton = false
+    private var showEmojiButton = CHAT_BOX_ICON_DEFAULT_VISIBILITY
     private var emojiButtonIcon = DEFAULT_VALUE
 
     private var inputText: String = ""
     private var inputMaxLines = DEFAULT_VALUE
 
-    private var inputHint: String = ""
+    private var inputHint: String = getString(R.string.chat_box_hint)
 
     private var inputTextSize = DEFAULT_VALUE
     private var inputTextColor = DEFAULT_VALUE
     private var inputHintColor = DEFAULT_VALUE
 
-    private var showRecordButton = false
+    private var showRecordButton = CHAT_BOX_ICON_DEFAULT_VISIBILITY
     private var recordButtonIcon = DEFAULT_VALUE
 
 
@@ -43,13 +44,13 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 typedArray.getResourceId(R.styleable.ChatBox_sendButtonIcon, DEFAULT_VALUE)
 
             style.showAttachmentButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showAttachmentButton, false)
+                typedArray.getBoolean(R.styleable.ChatBox_showAttachmentButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
 
             style.attachmentButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_attachmentButtonIcon, DEFAULT_VALUE)
 
             style.showEmojiButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showEmojiButton, false)
+                typedArray.getBoolean(R.styleable.ChatBox_showEmojiButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
 
             style.emojiButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_emojiButtonIcon, DEFAULT_VALUE)
@@ -62,7 +63,7 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 DEFAULT_MAX_LINES
             )
 
-            style.inputHint = typedArray.getString(R.styleable.ChatBox_inputHint) ?: ""
+            style.inputHint = typedArray.getString(R.styleable.ChatBox_inputHint) ?: style.getString(R.string.chat_box_hint)
 
             style.inputTextSize = typedArray.getDimensionPixelSize(
                 R.styleable.ChatBox_inputTextSize,
@@ -77,11 +78,8 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
                 style.getColor(R.color.warm_grey_three)
             )
 
-            style.showEmojiButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showEmojiButton, false)
-
             style.showRecordButton =
-                typedArray.getBoolean(R.styleable.ChatBox_showRecordButton, false)
+                typedArray.getBoolean(R.styleable.ChatBox_showRecordButton, CHAT_BOX_ICON_DEFAULT_VISIBILITY)
 
             style.recordButtonIcon =
                 typedArray.getResourceId(R.styleable.ChatBox_recordButtonIcon, DEFAULT_VALUE)

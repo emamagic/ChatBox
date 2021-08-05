@@ -25,4 +25,10 @@
         <attr name="slideToCancelArrow" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="CircleColorImageView">
+        <attr name="circleColor" format="color" />
+        <attr name="foregroundImageTintColor" format="color" />
+    </declare-styleable>
+
+
 </resources>

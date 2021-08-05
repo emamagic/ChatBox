@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Handler
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -190,5 +191,10 @@ class AnimationHelper(
     fun setStartRecorded(startRecorded: Boolean) {
         isStartRecorded = startRecorded
     }
-
+    companion object {
+        @JvmStatic
+        fun isAppAnimationEnabled(): Boolean {
+            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        }
+    }
 }

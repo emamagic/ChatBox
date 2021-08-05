@@ -6,25 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
-<!--    <com.emamagic.message_input.MessageInput-->
-<!--        android:id="@+id/message_input"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        android:layoutDirection="ltr"-->
-<!--        app:showAttachmentButton="true"-->
-<!--        app:showEmojiButton="true"/>-->
-
-
     <com.emamagic.chat_box.ChatBox
+        android:id="@+id/chat_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layoutDirection="ltr"
-        app:showAttachmentButton="true"
-        app:inputHint="write your message"
-        app:showEmojiButton="true" />
+        android:layout_alignParentBottom="true"/>
 
 
 </RelativeLayout>

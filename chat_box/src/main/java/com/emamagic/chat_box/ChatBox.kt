@@ -1,8 +1,8 @@
 package com.emamagic.chat_box
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,25 +13,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.ViewCompat
 import com.emamagic.emoji.EmojIconActions
-import java.lang.Exception
 
 class ChatBox @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayoutCompat(context, attrs, defStyleAttr), TextWatcher,
-    MessageEditText.KeyPreImeListener, View.OnFocusChangeListener {
+    MessageEditText.KeyPreImeListener, View.OnFocusChangeListener, View.OnClickListener {
 
     private lateinit var messageInput: MessageEditText
-    private lateinit var messageSendButton: ImageButton
+    private lateinit var sendButton: ImageButton
     private lateinit var emojiButton: ImageButton
     private lateinit var attachmentButton: ImageButton
     private lateinit var recordButton: RecordButton
-
     private lateinit var chatBoxStyle: ChatBoxStyle
-    private var showAttachmentButton = false
+    private var attachmentTypeSelector: AttachmentTypeSelector? = null
+    private var input: String = ""
+    private lateinit var activity: Activity
+
+    private var attachmentsListener: AttachmentsListener? = null
+    private var inputListener: InputListener? = null
 
     init {
         initViews(context)
@@ -43,7 +45,7 @@ class ChatBox @JvmOverloads constructor(
         inflate(context, R.layout.chat_box_layout, this)
         orientation = LinearLayout.VERTICAL
         messageInput = findViewById(R.id.messageInput)
-        messageSendButton = findViewById(R.id.sendButton)
+        sendButton = findViewById(R.id.sendButton)
         recordButton = findViewById(R.id.recordButton)
         emojiButton = findViewById(R.id.emojiButton)
         attachmentButton = findViewById(R.id.attachmentButton)
@@ -54,16 +56,19 @@ class ChatBox @JvmOverloads constructor(
         chatBoxStyle = ChatBoxStyle.parse(context, attrs)
         messageInput.maxLines = chatBoxStyle.getInputMaxLines()
         messageInput.hint = chatBoxStyle.getInputHint()
-        messageSendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
-
+        sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
+        if (chatBoxStyle.isShowingRecordButton()) {
+            sendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+        } else {
+            sendButton.visibility = View.GONE
+        }
         messageInput.setTextSize(
             TypedValue.COMPLEX_UNIT_PX,
             chatBoxStyle.getInputTextSize().toFloat()
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-        showAttachmentButton = chatBoxStyle.isShowingAttachmentButton()
-        attachmentButton.visibility = if (showAttachmentButton) VISIBLE else GONE
+        attachmentButton.visibility = if (chatBoxStyle.isShowingAttachmentButton()) VISIBLE else GONE
         attachmentButton.setImageDrawable(chatBoxStyle.getAttachmentButtonIcon())
         emojiButton.visibility = if (chatBoxStyle.isShowingEmojiButton()) VISIBLE else GONE
         emojiButton.setImageDrawable(chatBoxStyle.getEmojiButtonIcon())
@@ -73,7 +78,7 @@ class ChatBox @JvmOverloads constructor(
             chatBoxStyle.getDefaultIconBackground()
         )
         ViewCompat.setBackground(
-            messageSendButton,
+            sendButton,
             chatBoxStyle.getDefaultIconBackground()
         )
         ViewCompat.setBackground(
@@ -83,8 +88,8 @@ class ChatBox @JvmOverloads constructor(
     }
 
     private fun setUpViews() {
-        messageSendButton.setOnClickListener(onClickListener)
-        attachmentButton.setOnClickListener(onClickListener)
+        sendButton.setOnClickListener(this)
+        attachmentButton.setOnClickListener(this)
         val emojiIcon = EmojIconActions(context, this, messageInput, emojiButton)
         emojiIcon.ShowEmojIcon()
         emojiIcon.setIconsIds(R.drawable.ic_keyboard, R.drawable.ic_emoji)
@@ -95,20 +100,39 @@ class ChatBox @JvmOverloads constructor(
 
     override fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) {}
     override fun afterTextChanged(p0: Editable?) {}
-    override fun onTextChanged(s: CharSequence, p1: Int, p2: Int, p3: Int) {
-        if (s.isEmpty()) {
+    override fun onTextChanged(input: CharSequence, p1: Int, p2: Int, p3: Int) {
+        this.input = input.toString()
+        if (input.isEmpty()) {
+            attachmentButton.visibility = View.VISIBLE
             if (chatBoxStyle.isShowingRecordButton()) {
-                messageSendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+                sendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
             } else {
-                messageSendButton.isEnabled = false
-                messageSendButton.visibility = INVISIBLE
+                sendButton.visibility = View.GONE
+            }
+        } else {
+            sendButton.visibility = View.VISIBLE
+            attachmentButton.visibility = View.GONE
+            sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
+        }
+    }
+
+
+    override fun onClick(view: View) {
+        when(view.id) {
+            R.id.sendButton -> { inputListener?.onSubmit(input) }
+            R.id.attachmentButton -> {
+                if (attachmentsListener == null) {
+                    if (attachmentTypeSelector == null) {
+                        attachmentTypeSelector = AttachmentTypeSelector(context, activity)
+                    }
+                    attachmentTypeSelector?.show(attachmentButton)
+                } else {
+                    attachmentsListener?.onAddAttachments()
+                }
             }
         }
     }
 
-    private val onClickListener = View.OnClickListener {
-
-    }
 
     override fun onHideKeyboard(): Boolean {
         Utility.hideKeyboard(messageInput)
@@ -134,21 +158,34 @@ class ChatBox @JvmOverloads constructor(
         }
     }
 
+    fun setInputListener(inputListener: InputListener, activity: Activity) {
+        this.inputListener = inputListener
+        this.activity = activity
+    }
+
+    fun setAttachmentListener(attachmentsListener: AttachmentsListener) {
+        this.attachmentsListener = attachmentsListener
+    }
+
+
     interface InputListener {
-        fun onSubmit(input: CharSequence?): Boolean
+        fun onSubmit(input: String)
     }
 
     interface AttachmentsListener {
-        fun onAddAttachments(attachmentBtnAnchor: View?)
+        fun onAddAttachments()
     }
 
-    interface VoiceListener {
-        fun onVoiceMessageFinish(time: String?, uri: Uri?)
+    interface RecorderListener {
+        fun onRecordFinish(time: String, uri: Uri)
     }
 
-    override fun onFocusChange(p0: View?, p1: Boolean) {
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
 
     }
-
+    interface TypingListener {
+        fun onStartTyping()
+        fun onStopTyping()
+    }
 
 }

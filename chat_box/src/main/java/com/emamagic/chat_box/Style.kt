@@ -6,10 +6,7 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
+import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
@@ -27,6 +24,10 @@ abstract class Style protected constructor(private var context: Context, attrs: 
 
     protected fun getDrawable(@DrawableRes drawable: Int): Drawable? {
         return ContextCompat.getDrawable(context, drawable)
+    }
+
+    protected fun getString(@StringRes string: Int): String {
+        return context.getString(string)
     }
 
     protected fun getSelector(

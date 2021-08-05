@@ -149,6 +149,9 @@
     <dimen name="standard_128">128dp</dimen>
     <dimen name="standard_192">192dp</dimen>
     <dimen name="dialog_width">280dp</dimen>
+    <dimen name="chat_box_icon_width">30dp</dimen>
+    <dimen name="chat_box_icon_margin_horizontally">12dp</dimen>
+    <dimen name="chat_box_icon_margin_vertically">8dp</dimen>
 
 
 </resources>

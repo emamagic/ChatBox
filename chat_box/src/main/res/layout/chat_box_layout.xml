@@ -6,18 +6,26 @@
 
     <ImageButton
         android:id="@+id/emojiButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/chat_box_icon_width"
         android:layout_height="0dp"
+        android:layout_marginStart="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginEnd="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginTop="@dimen/chat_box_icon_margin_vertically"
+        android:layout_marginBottom="@dimen/chat_box_icon_margin_vertically"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@id/attachmentButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/chat_box_icon_width"
         android:layout_height="0dp"
+        android:layout_marginStart="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginEnd="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginTop="@dimen/chat_box_icon_margin_vertically"
+        android:layout_marginBottom="@dimen/chat_box_icon_margin_vertically"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/emojiButton"
+        app:layout_constraintStart_toEndOf="@id/sendButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.emamagic.chat_box.MessageEditText
@@ -25,15 +33,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:background="@color/transparent"
+        android:layout_marginStart="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginEnd="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginTop="@dimen/chat_box_icon_margin_vertically"
+        android:layout_marginBottom="@dimen/chat_box_icon_margin_vertically"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/attachmentButton"
-        app:layout_constraintStart_toEndOf="@id/sendButton"
+        app:layout_constraintEnd_toStartOf="@id/emojiButton"
+        app:layout_constraintStart_toEndOf="@id/attachmentButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@id/sendButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/chat_box_icon_width"
         android:layout_height="0dp"
+        android:layout_marginStart="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginEnd="@dimen/chat_box_icon_margin_horizontally"
+        android:layout_marginTop="@dimen/chat_box_icon_margin_vertically"
+        android:layout_marginBottom="@dimen/chat_box_icon_margin_vertically"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
