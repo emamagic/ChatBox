@@ -38,6 +38,7 @@ class ChatBox @JvmOverloads constructor(
     private var input: String = ""
     private var isTyping: Boolean = false
     private lateinit var activity: Activity
+    private var captureUriImageFromCamera: Uri? = null
 
     private var attachmentsListener: AttachmentsListener? = null
     private var inputListener: InputListener? = null
@@ -124,7 +125,7 @@ class ChatBox @JvmOverloads constructor(
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-       setMargin(messageInput, chatBoxStyle.getEmojiButtonMargin())
+        setMargin(messageInput, chatBoxStyle.getEmojiButtonMargin())
 
 
         /* record button */
@@ -188,7 +189,12 @@ class ChatBox @JvmOverloads constructor(
     }
 
     private fun setMargin(view: View, margin: Int) {
-        (view.layoutParams as ConstraintLayout.LayoutParams).setMargins(margin, margin, margin, margin)
+        (view.layoutParams as ConstraintLayout.LayoutParams).setMargins(
+            margin,
+            resources.getDimensionPixelSize(R.dimen.input_button_margin),
+            margin,
+            resources.getDimensionPixelSize(R.dimen.input_button_margin)
+        )
     }
 
 
@@ -200,7 +206,8 @@ class ChatBox @JvmOverloads constructor(
             R.id.attachmentButton -> {
                 if (attachmentsListener == null) {
                     if (attachmentTypeSelector == null) {
-                        attachmentTypeSelector = AttachmentTypeSelector(context, activity)
+                        attachmentTypeSelector =
+                            AttachmentTypeSelector(context, activity, captureUriImageFromCamera)
                     }
                     attachmentTypeSelector?.show(attachmentButton)
                 } else {
@@ -248,13 +255,20 @@ class ChatBox @JvmOverloads constructor(
         }
     }
 
-    fun setInputListener(inputListener: InputListener, activity: Activity) {
-        this.inputListener = inputListener
+    fun init(activity: Activity) {
         this.activity = activity
+    }
+
+    fun setInputListener(inputListener: InputListener) {
+        this.inputListener = inputListener
     }
 
     fun setAttachmentListener(attachmentsListener: AttachmentsListener) {
         this.attachmentsListener = attachmentsListener
+    }
+
+    fun setUriForCamera(captureUriImageFromCamera: Uri) {
+        this.captureUriImageFromCamera = captureUriImageFromCamera
     }
 
     fun setTypingListener(typingListener: TypingListener) {
@@ -276,6 +290,14 @@ class ChatBox @JvmOverloads constructor(
     interface TypingListener {
         fun onStartTyping()
         fun onStopTyping()
+    }
+
+    companion object {
+        const val PICK_GALLERY_REQUEST_ID = 1
+        const val PICK_DOCUMENT_REQUEST_ID = 2
+        const val PICK_AUDIO_REQUEST_ID = 3
+        const val PICK_CONTACT_REQUEST_ID = 4
+        const val TAKE_PHOTO_REQUEST_ID = 5
     }
 
 }

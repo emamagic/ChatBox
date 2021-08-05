@@ -5,10 +5,9 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import com.emamagic.chat_box.Const.DEFAULT_VALUE
 
-const val DEFAULT_MAX_LINES = 5
-const val CHAT_BOX_ICON_DEFAULT_VISIBILITY = true
-const val DEFAULT_DELAY_TYPING_STATUS = 1000
-
+private const val DEFAULT_MAX_LINES = 5
+private const val DEFAULT_DELAY_TYPING_STATUS = 1000
+private const val CHAT_BOX_ICON_DEFAULT_VISIBILITY = true
 class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs) {
 
     /* send button icon */

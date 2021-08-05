@@ -5,6 +5,7 @@ import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Build
 import android.util.Pair
 import android.view.*
@@ -12,12 +13,14 @@ import android.view.animation.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.Toast
 
-const val PICK_GALLERY_REQUEST_ID = 1
-const val PICK_DOCUMENT_REQUEST_ID = 2
-const val PICK_AUDIO_REQUEST_ID = 3
-const val PICK_CONTACT_REQUEST_ID = 4
-class AttachmentTypeSelector(context: Context, private val activity: Activity) :
+private const val PICK_GALLERY_REQUEST_ID = 1
+private const val PICK_DOCUMENT_REQUEST_ID = 2
+private const val PICK_AUDIO_REQUEST_ID = 3
+private const val PICK_CONTACT_REQUEST_ID = 4
+private const val TAKE_PHOTO_REQUEST_ID = 5
+class AttachmentTypeSelector(context: Context, private val activity: Activity, private val captureUriImageFromCamera: Uri?) :
     PopupWindow(context) {
     private val imageButton: ImageView
     private val audioButton: ImageView
@@ -174,20 +177,16 @@ class AttachmentTypeSelector(context: Context, private val activity: Activity) :
                 PICK_CONTACT_REQUEST_ID
             )
             TAKE_PHOTO -> {
-//                val tempFileName =
-//                    System.currentTimeMillis().toString() + "." + MimeTypeMap.getSingleton()
-//                        .getExtensionFromMimeType(IMAGE_JPEG)
-//                val captureUri = FileHelper.getUriWithContentScheme(
-//                    activity,
-//                    FileHelper.getNewFileInDirectory(tempFileName, activity.cacheDir)
-//                )
-//                if (captureUri != null) {
-//                    AttachmentManager.capturePhoto(
-//                        activity,
-//                        TAKE_PHOTO_REQUEST_ID,
-//                        captureUri
-//                    )
-//                }
+                if (captureUriImageFromCamera != null) {
+                    AttachmentManager.capturePhoto(
+                        activity,
+                        TAKE_PHOTO_REQUEST_ID,
+                        captureUriImageFromCamera
+                    )
+                } else {
+                    Toast.makeText(activity, "set capture uri for camera", Toast.LENGTH_SHORT).show()
+                }
+
             }
         }
     }

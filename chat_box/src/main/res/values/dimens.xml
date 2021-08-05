@@ -112,7 +112,7 @@
     <dimen name="auto_complete_avatar_height">30dp</dimen>
     <dimen name="input_button_width">24dp</dimen>
     <dimen name="input_button_height">24dp</dimen>
-    <dimen name="input_button_margin">8dp</dimen>
+    <dimen name="input_button_margin">12dp</dimen>
     <dimen name="input_text_size">17sp</dimen>
     <dimen name="input_padding_left">12sp</dimen>
     <dimen name="input_padding_right">12sp</dimen>
