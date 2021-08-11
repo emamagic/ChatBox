@@ -153,5 +153,8 @@
     <dimen name="chat_box_icon_margin_horizontally">12dp</dimen>
     <dimen name="chat_box_icon_margin_vertically">8dp</dimen>
 
+    <dimen name="kwik_picker_grid_layout_margin">1dp</dimen>
+    <dimen name="kwik_picker_selected_image_height">90dp</dimen>
+
 
 </resources>

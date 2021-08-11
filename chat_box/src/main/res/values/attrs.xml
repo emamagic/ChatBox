@@ -87,6 +87,16 @@
         <attr name="circleColor" format="color" />
         <attr name="foregroundImageTintColor" format="color" />
     </declare-styleable>
+    <declare-styleable name="KwikPickerImageView">
+        <attr name="foreground" format="reference"/>
+        <attr name="fit_mode" format="string"/>
+    </declare-styleable>
 
+
+
+    <declare-styleable name="KwikPickerSquareView">
+        <attr name="matchHeightToWidth" format="boolean"/>
+        <attr name="matchWidthToHeight" format="boolean"/>
+    </declare-styleable>
 
 </resources>

@@ -12,5 +12,31 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
 
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin" />
+
+    <HorizontalScrollView
+        android:id="@+id/hori_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_image"
+        android:fillViewport="false"
+        android:foregroundGravity="left">
+        <LinearLayout
+            android:id="@+id/selected_photos_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:animateLayoutChanges="true"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:visibility="visible">
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </RelativeLayout>

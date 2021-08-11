@@ -30,4 +30,10 @@
     <string name="AttachmentManager_requires_location_information_in_order_to_attach_a_location">Limoo برای استفاده از سرویس مکانیاب،  نیازمند دسترسی به سرویس مکان دارد ولی این دسترسی قطع شده است. لطفا برای ادامه دادن، به بخش منوی تنظیمات برنامه رفته، \"اجازه ها\" را انتخاب کرده و گزینه ی \"مکان\" را فعال نمایید.</string>
     <string name="AttachmentManager_requires_the_camera_permission_in_order_to_take_photos_but_it_has_been_permanently_denied">Limoo جهت گرفتن عکس نیاز به دسترسی دوربین دارد، اما به طور دائم رد شده است. لطفاً به منوی تنظیمات برنامه ها رفته، \"Permissions\" را انتخاب کرده، و \"Camera\" را فعال کنید.</string>
 
+    <string name="kwik_picker_title">Select Image</string>
+    <string name="no_image">No Image</string>
+    <string name="done">Done</string>
+
+    <string name="select_max_count">Already %1$d images selected</string>
+    <string name="select_min_count">You have to choose %1$d images</string>
 </resources>
