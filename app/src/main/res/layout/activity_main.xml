@@ -10,6 +10,7 @@
         android:id="@+id/chat_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:showRecordButton="true"
         android:layout_alignParentBottom="true"/>
 
     <ImageView

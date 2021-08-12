@@ -78,6 +78,15 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
     /* record button */
     private var showRecordButton = CHAT_BOX_ICON_DEFAULT_VISIBILITY
     private var recordButtonIcon = DEFAULT_VALUE
+    private var recordButtonIconColor = DEFAULT_VALUE
+    private var recordButtonIconPressedColor = DEFAULT_VALUE
+    private var recordButtonIconDisabledColor = DEFAULT_VALUE
+
+    /* record button background */
+    private var recordButtonBackground = DEFAULT_VALUE
+    private var recordButtonBgColor = DEFAULT_VALUE
+    private var recordButtonBgPressedColor = DEFAULT_VALUE
+    private var recordButtonBgDisabledColor = DEFAULT_VALUE
 
     /* typing status */
     private var delayTypingStatus = DEFAULT_DELAY_TYPING_STATUS
@@ -437,12 +446,21 @@ class ChatBoxStyle(context: Context, attrs: AttributeSet) : Style(context, attrs
     fun getRecordButtonIcon(): Drawable? {
         return if (recordButtonIcon == DEFAULT_VALUE) {
             getSelector(
-                getColor(R.color.warm_grey), getColor(R.color.colorPrimaryDark),
-                getColor(R.color.warm_grey), R.drawable.recv_ic_mic
+                recordButtonIconColor, recordButtonIconPressedColor,
+                recordButtonIconDisabledColor, R.drawable.record_audio_ic
             )
         } else {
             getDrawable(recordButtonIcon)
         }
     }
-
+    fun getRecordButtonBackground(): Drawable? {
+        return if (recordButtonBackground == DEFAULT_VALUE) {
+            getSelector(
+                recordButtonBgColor, recordButtonBgPressedColor,
+                recordButtonBgDisabledColor, R.drawable.mask
+            )
+        } else {
+            getDrawable(recordButtonBackground)
+        }
+    }
 }

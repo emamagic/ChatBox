@@ -35,7 +35,7 @@ class RecordView @JvmOverloads constructor(
     private var startTime: Long = 0
     private var elapsedTime: Long = 0
     private var recordListener: OnRecordListener? = null
-    private var recordPermissionHandler: RecordPermissionHandler? = null
+    private var permissionHandler: RecordPermissionHandler? = null
     private var isSwiped = false
     private var isLessThanSecondAllowed: Boolean = false
     private var isSoundEnabled = true
@@ -287,10 +287,10 @@ class RecordView @JvmOverloads constructor(
 
 
     private fun isRecordPermissionGranted(): Boolean {
-        if (recordPermissionHandler == null) {
+        if (permissionHandler == null) {
             canRecord = true
         }
-        canRecord = recordPermissionHandler?.isPermissionGranted() == true
+        canRecord = permissionHandler?.isPermissionGranted() == true
         return canRecord
     }
 
@@ -308,7 +308,7 @@ class RecordView @JvmOverloads constructor(
     }
 
     fun setRecordPermissionHandler(recordPermissionHandler: RecordPermissionHandler?) {
-        this.recordPermissionHandler = recordPermissionHandler
+        this.permissionHandler = recordPermissionHandler
     }
 
     fun setOnBasketAnimationEndListener(onBasketAnimationEndListener: OnBasketAnimationEnd) {

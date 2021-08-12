@@ -52,6 +52,8 @@ class MessageEditText @JvmOverloads constructor(
         }
     }
 
+    fun clear() { setText("") }
+
     interface KeyPreImeListener {
         fun onHideKeyboard(): Boolean
     }

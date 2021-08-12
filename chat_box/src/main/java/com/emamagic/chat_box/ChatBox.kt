@@ -1,25 +1,34 @@
 package com.emamagic.chat_box
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.animation.*
+import android.widget.*
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.ViewCompat
 import com.emamagic.emoji.EmojIconActions
 import java.lang.Exception
 
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.emamagic.emoji.EmojiManager
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.abs
 
 
 class ChatBox @JvmOverloads constructor(
@@ -31,7 +40,7 @@ class ChatBox @JvmOverloads constructor(
     private lateinit var sendButton: ImageButton
     private lateinit var emojiButton: ImageButton
     private lateinit var attachmentButton: ImageButton
-    private lateinit var recordButton: RecordButton
+    private lateinit var recordButton: ImageView
     private lateinit var chatBoxStyle: ChatBoxStyle
     private var attachmentTypeSelector: AttachmentTypeSelector? = null
     private var delayTypingStatusMillis = 0
@@ -43,6 +52,61 @@ class ChatBox @JvmOverloads constructor(
     private var attachmentsListener: AttachmentsListener? = null
     private var inputListener: InputListener? = null
     private var typingListener: TypingListener? = null
+
+
+    private lateinit var layoutLock: View
+    private lateinit var layoutSlideCancel: View
+    private lateinit var imageViewMic: View
+    private lateinit var layoutEffect1: View
+    private lateinit var layoutEffect2: View
+    private lateinit var imageViewLock: View
+    private lateinit var imageViewLockArrow: View
+    private lateinit var timeText: TextView
+    private lateinit var mHandler: Handler
+    private lateinit var dustin: ImageView
+    private lateinit var dustin_cover: ImageView
+
+    private val recordListener: RecordListener? = null
+    private var isDeleting = false
+    private var stopTrackingAction = false
+
+    private lateinit var animBlink: Animation
+    private lateinit var animJump: Animation
+    private lateinit var animJumpFast: Animation
+
+    private var dp = 0f
+    private var isLocked = false
+
+    var isLayoutDirectionRightToLeft = false
+
+    private var audioTotalTime = 0L
+    private lateinit var timerTask: TimerTask
+    private var audioTimer: Timer? = null
+    private var timeFormatter: SimpleDateFormat? = null
+
+    private var lastX = 0f
+    private var lastY = 0f
+    private var firstX = 0f
+    private var firstY = 0f
+
+
+    private var directionOffset = 0f
+    private var cancelOffset = 0f
+    private var lockOffset = 0f
+
+
+    private var screenWidth = 0
+    private var screenHeight: Int = 0
+
+    private var userBehaviour = UserBehaviour.NONE
+
+    enum class UserBehaviour {
+        CANCELING, LOCKING, NONE
+    }
+
+    enum class RecordingBehaviour {
+        CANCELED, LOCKED, LOCK_DONE, RELEASED
+    }
 
     private var typingTimerRunnable = Runnable {
         if (isTyping) {
@@ -67,6 +131,16 @@ class ChatBox @JvmOverloads constructor(
         recordButton = findViewById(R.id.recordButton)
         emojiButton = findViewById(R.id.emojiButton)
         attachmentButton = findViewById(R.id.attachmentButton)
+        layoutLock = findViewById(R.id.layoutLock)
+        layoutSlideCancel = findViewById(R.id.layoutSlideCancel)
+        imageViewMic = findViewById(R.id.imageViewMic)
+        imageViewLock = findViewById(R.id.imageViewLock)
+        imageViewLockArrow = findViewById(R.id.imageViewLockArrow)
+        timeText = findViewById(R.id.textViewTime)
+        layoutEffect1 = findViewById(R.id.layoutEffect1)
+        layoutEffect2 = findViewById(R.id.layoutEffect2)
+        dustin = findViewById(R.id.dustin)
+        dustin_cover = findViewById(R.id.dustin_cover)
         setUpViews()
     }
 
@@ -78,14 +152,9 @@ class ChatBox @JvmOverloads constructor(
             sendButton,
             chatBoxStyle.getSendButtonBackground()
         )
-        if (chatBoxStyle.isShowingRecordButton()) {
-            sendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
-        } else {
-            sendButton.visibility = View.GONE
-        }
+        sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
         sendButton.layoutParams.width = chatBoxStyle.getSendButtonWidth()
         sendButton.layoutParams.height = chatBoxStyle.getSendButtonHeight()
-        setMargin(sendButton, chatBoxStyle.getSendButtonMargin())
 
 
         /* attachment */
@@ -98,7 +167,6 @@ class ChatBox @JvmOverloads constructor(
         )
         attachmentButton.layoutParams.width = chatBoxStyle.getAttachmentButtonWidth()
         attachmentButton.layoutParams.height = chatBoxStyle.getAttachmentButtonHeight()
-        setMargin(attachmentButton, chatBoxStyle.getAttachmentButtonMargin())
 
 
         /* emoji */
@@ -110,7 +178,6 @@ class ChatBox @JvmOverloads constructor(
         )
         emojiButton.layoutParams.width = chatBoxStyle.getEmojiButtonWidth()
         emojiButton.layoutParams.height = chatBoxStyle.getEmojiButtonHeight()
-        setMargin(emojiButton, chatBoxStyle.getEmojiButtonMargin())
 
 
         /* input text */
@@ -125,21 +192,80 @@ class ChatBox @JvmOverloads constructor(
         )
         messageInput.setTextColor(chatBoxStyle.getInputTextColor())
         messageInput.setHintTextColor(chatBoxStyle.getInputHintColor())
-        setMargin(messageInput, chatBoxStyle.getEmojiButtonMargin())
 
 
         /* record button */
         recordButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+        ViewCompat.setBackground(
+            recordButton,
+            chatBoxStyle.getRecordButtonBackground()
+        )
 
         /* typing status */
         delayTypingStatusMillis = chatBoxStyle.getDelayTypingStatus()
 
+        mHandler = Handler(Looper.getMainLooper())
+        val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+        screenHeight = displayMetrics.heightPixels
+        screenWidth = displayMetrics.widthPixels
 
+        timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
+        dp = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            1f,
+            context.resources.displayMetrics
+        )
+
+        animBlink = AnimationUtils.loadAnimation(
+            context,
+            R.anim.blink
+        )
+        animJump = AnimationUtils.loadAnimation(
+            context,
+            R.anim.jump
+        )
+        animJumpFast = AnimationUtils.loadAnimation(
+            context,
+            R.anim.jump_fast
+        )
+
+        setupRecording()
+        setUpSubmitProcess(chatBoxStyle)
     }
+
+    private fun setUpSubmitProcess(chatBoxStyle: ChatBoxStyle) {
+        if (chatBoxStyle.getInputText().isEmpty()) {
+            if (chatBoxStyle.isShowingRecordButton()) {
+                showSubmit(false)
+            } else {
+                showSubmit(true)
+            }
+        } else {
+            showSubmit(false)
+        }
+    }
+
+    private fun showSubmit(show: Boolean) {
+        if (show) {
+            recordButton.visibility = View.GONE
+            sendButton.visibility = View.VISIBLE
+            sendButton.animate().scaleX(1f).scaleY(1f).setDuration(100).setInterpolator(
+                LinearInterpolator()
+            ).start()
+        } else {
+            recordButton.visibility = View.VISIBLE
+            sendButton.visibility = View.GONE
+            sendButton.animate().scaleX(0f).scaleY(0f).setDuration(100).setInterpolator(
+                LinearInterpolator()
+            ).start()
+        }
+    }
+
 
     private fun setUpViews() {
         sendButton.setOnClickListener(this)
         attachmentButton.setOnClickListener(this)
+        EmojiManager.initEmojiData(context)
         val emojiIcon = EmojIconActions(context, this, messageInput, emojiButton)
         emojiIcon.ShowEmojIcon()
         emojiIcon.setIconsIds(R.drawable.ic_keyboard, R.drawable.ic_emoji)
@@ -151,18 +277,16 @@ class ChatBox @JvmOverloads constructor(
     override fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) {}
     override fun afterTextChanged(p0: Editable?) {}
     override fun onTextChanged(input: CharSequence, p1: Int, p2: Int, p3: Int) {
-        this.input = input.toString()
+        this.input = input.toString().trim()
         if (input.isEmpty()) {
-            attachmentButton.visibility = View.VISIBLE
             if (chatBoxStyle.isShowingRecordButton()) {
-                sendButton.setImageDrawable(chatBoxStyle.getRecordButtonIcon())
+                showSubmit(false)
             } else {
-                sendButton.visibility = View.GONE
+                showSubmit(true)
             }
         } else {
             startTyping()
-            sendButton.visibility = View.VISIBLE
-            attachmentButton.visibility = View.GONE
+            showSubmit(true)
             sendButton.setImageDrawable(chatBoxStyle.getSendButtonIcon())
         }
     }
@@ -188,20 +312,12 @@ class ChatBox @JvmOverloads constructor(
         }
     }
 
-    private fun setMargin(view: View, margin: Int) {
-        (view.layoutParams as ConstraintLayout.LayoutParams).setMargins(
-            margin,
-            resources.getDimensionPixelSize(R.dimen.input_button_margin),
-            margin,
-            resources.getDimensionPixelSize(R.dimen.input_button_margin)
-        )
-    }
-
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.sendButton -> {
                 inputListener?.onSubmit(input)
+                messageInput.clear()
             }
             R.id.attachmentButton -> {
                 if (attachmentsListener == null) {
@@ -275,6 +391,301 @@ class ChatBox @JvmOverloads constructor(
         this.typingListener = typingListener;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupRecording() {
+        sendButton.animate().scaleX(0f).scaleY(0f).setDuration(100)
+            .setInterpolator(LinearInterpolator()).start()
+        recordButton.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
+            if (isDeleting) {
+                return@OnTouchListener true
+            }
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                cancelOffset = (screenWidth / 2.8f)
+                lockOffset = (screenWidth / 2.5).toFloat()
+                if (firstX == 0f) {
+                    firstX = motionEvent.rawX
+                }
+                if (firstY == 0f) {
+                    firstY = motionEvent.rawY
+                }
+                startRecord()
+            } else if (motionEvent.action == MotionEvent.ACTION_UP
+                || motionEvent.action == MotionEvent.ACTION_CANCEL
+            ) {
+                if (motionEvent.action == MotionEvent.ACTION_UP) {
+                    stopRecording(RecordingBehaviour.RELEASED)
+                }
+            } else if (motionEvent.action == MotionEvent.ACTION_MOVE) {
+                if (stopTrackingAction) {
+                    return@OnTouchListener true
+                }
+                var direction = UserBehaviour.NONE
+                val motionX = abs(firstX - motionEvent.rawX)
+                val motionY = abs(firstY - motionEvent.rawY)
+                if (if (isLayoutDirectionRightToLeft) motionX > directionOffset && lastX > firstX && lastY > firstY else motionX > directionOffset && lastX < firstX && lastY < firstY) {
+                    if (if (isLayoutDirectionRightToLeft) motionX > motionY && lastX > firstX else motionX > motionY && lastX < firstX) {
+                        direction = UserBehaviour.CANCELING
+                    } else if (motionY > motionX && lastY < firstY) {
+                        direction = UserBehaviour.LOCKING
+                    }
+                } else if (if (isLayoutDirectionRightToLeft) motionX > motionY && motionX > directionOffset && lastX > firstX else motionX > motionY && motionX > directionOffset && lastX < firstX) {
+                    direction = UserBehaviour.CANCELING
+                } else if (motionY > motionX && motionY > directionOffset && lastY < firstY) {
+                    direction = UserBehaviour.LOCKING
+                }
+                if (direction == UserBehaviour.CANCELING) {
+                    if (userBehaviour == UserBehaviour.NONE || motionEvent.rawY + recordButton.width / 2 > firstY) {
+                        userBehaviour = UserBehaviour.CANCELING
+                    }
+                    if (userBehaviour == UserBehaviour.CANCELING) {
+                        translateX(-(firstX - motionEvent.rawX))
+                    }
+                } else if (direction == UserBehaviour.LOCKING) {
+                    if (userBehaviour == UserBehaviour.NONE || motionEvent.rawX + recordButton.width / 2 > firstX) {
+                        userBehaviour = UserBehaviour.LOCKING
+                    }
+                    if (userBehaviour == UserBehaviour.LOCKING) {
+                        translateY(-(firstY - motionEvent.rawY))
+                    }
+                }
+                lastX = motionEvent.rawX
+                lastY = motionEvent.rawY
+            }
+            view.onTouchEvent(motionEvent)
+            true
+        })
+//        imageViewStop.setOnClickListener {
+//            isLocked = false
+//            stopRecording(RecordingBehaviour.LOCK_DONE)
+//        }
+    }
+
+    private fun translateY(y: Float) {
+        if (y < -lockOffset) {
+            locked()
+            recordButton.translationY = 0f
+            return
+        }
+        if (layoutLock.visibility != View.VISIBLE) {
+            layoutLock.visibility = View.VISIBLE
+        }
+        recordButton.translationY = y
+        layoutLock.translationY = y / 2
+        recordButton.translationX = 0f
+    }
+
+    private fun translateX(x: Float) {
+        if (if (isLayoutDirectionRightToLeft) x > cancelOffset else x < -cancelOffset) {
+            canceled()
+            recordButton.translationX = 0f
+            layoutSlideCancel.translationX = 0f
+            return
+        }
+        recordButton.translationX = x
+        layoutSlideCancel.translationX = x
+        layoutLock.translationY = 0f
+        recordButton.translationY = 0f
+        if (abs(x) < imageViewMic.width / 2) {
+            if (layoutLock.visibility != View.VISIBLE) {
+                layoutLock.visibility = View.VISIBLE
+            }
+        } else {
+            if (layoutLock.visibility != View.GONE) {
+                layoutLock.visibility = View.GONE
+            }
+        }
+    }
+
+
+    private fun locked() {
+        stopTrackingAction = true
+        stopRecording(RecordingBehaviour.LOCKED)
+        isLocked = true
+    }
+
+    private fun canceled() {
+        stopTrackingAction = true
+        stopRecording(RecordingBehaviour.CANCELED)
+    }
+
+
+    private fun startRecord() {
+        recordListener?.onRecordingStarted()
+        stopTrackingAction = false
+        messageInput.visibility = View.INVISIBLE
+        attachmentButton.visibility = View.INVISIBLE
+        emojiButton.visibility = View.INVISIBLE
+        recordButton.animate().scaleXBy(1f).scaleYBy(1f).setDuration(200).setInterpolator(
+            OvershootInterpolator()
+        ).start()
+        timeText.visibility = View.VISIBLE
+        layoutLock.visibility = View.VISIBLE
+        layoutSlideCancel.visibility = View.VISIBLE
+        imageViewMic.visibility = View.VISIBLE
+        layoutEffect2.visibility = View.VISIBLE
+        layoutEffect1.visibility = View.VISIBLE
+        timeText.startAnimation(animBlink)
+        imageViewLockArrow.clearAnimation()
+        imageViewLock.clearAnimation()
+        imageViewLockArrow.startAnimation(animJumpFast)
+        imageViewLock.startAnimation(animJump)
+        if (audioTimer == null) {
+            audioTimer = Timer()
+            timeFormatter?.timeZone = TimeZone.getTimeZone("UTC")
+        }
+        timerTask = object : TimerTask() {
+            override fun run() {
+                mHandler.post {
+                    timeText.text = timeFormatter?.format(Date(audioTotalTime * 1000))
+                    audioTotalTime++
+                }
+            }
+        }
+        audioTotalTime = 0
+        audioTimer?.schedule(timerTask, 0, 1000)
+    }
+
+
+    private fun stopRecording(recordingBehaviour: RecordingBehaviour) {
+        stopTrackingAction = true
+        firstX = 0f
+        firstY = 0f
+        lastX = 0f
+        lastY = 0f
+        userBehaviour = UserBehaviour.NONE
+        recordButton.animate().scaleX(1f).scaleY(1f).translationX(0f).translationY(0f)
+            .setDuration(100).setInterpolator(
+                LinearInterpolator()
+            ).start()
+        layoutSlideCancel.translationX = 0f
+        layoutSlideCancel.visibility = View.GONE
+        layoutLock.visibility = View.GONE
+        layoutLock.translationY = 0f
+        imageViewLockArrow.clearAnimation()
+        imageViewLock.clearAnimation()
+        if (isLocked) {
+            return
+        }
+        if (recordingBehaviour == RecordingBehaviour.LOCKED) {
+            //imageViewStop.visibility = View.VISIBLE
+            recordListener?.onRecordingLocked()
+        } else if (recordingBehaviour == RecordingBehaviour.CANCELED) {
+            timeText.clearAnimation()
+            timeText.visibility = View.INVISIBLE
+            imageViewMic.visibility = View.INVISIBLE
+//            imageViewStop.visibility = View.GONE
+            layoutEffect2.visibility = View.GONE
+            layoutEffect1.visibility = View.GONE
+            timerTask.cancel()
+            delete()
+            recordListener?.onRecordingCanceled()
+        } else if (recordingBehaviour == RecordingBehaviour.RELEASED || recordingBehaviour == RecordingBehaviour.LOCK_DONE) {
+            timeText.clearAnimation()
+            timeText.visibility = View.INVISIBLE
+            imageViewMic.visibility = View.INVISIBLE
+            messageInput.visibility = View.VISIBLE
+            attachmentButton.visibility = View.VISIBLE
+            emojiButton.visibility = View.VISIBLE
+            //imageViewStop.visibility = View.GONE
+            messageInput.requestFocus()
+            layoutEffect2.visibility = View.GONE
+            layoutEffect1.visibility = View.GONE
+            timerTask.cancel()
+            recordListener?.onRecordingCompleted(12)
+        }
+    }
+
+
+    private fun delete() {
+        imageViewMic.visibility = View.VISIBLE
+        imageViewMic.rotation = 0f
+        isDeleting = true
+        recordButton.isEnabled = false
+        mHandler.postDelayed({
+            isDeleting = false
+            recordButton.isEnabled = true
+            attachmentButton.visibility = View.VISIBLE
+            emojiButton.visibility = View.VISIBLE
+        }, 1250)
+        imageViewMic.animate().translationY(-dp * 150).rotation(180f).scaleXBy(0.6f).scaleYBy(0.6f)
+            .setDuration(500).setInterpolator(
+                DecelerateInterpolator()
+            ).setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    val displacement: Float = if (isLayoutDirectionRightToLeft) {
+                        dp * 40
+                    } else {
+                        -dp * 40
+                    }
+                    dustin.translationX = displacement
+                    dustin_cover.translationX = displacement
+                    dustin_cover.animate().translationX(0f).rotation(-120f).setDuration(350)
+                        .setInterpolator(
+                            DecelerateInterpolator()
+                        ).start()
+                    dustin.animate().translationX(0f).setDuration(350).setInterpolator(
+                        DecelerateInterpolator()
+                    ).setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationStart(animation: Animator) {
+                            dustin.visibility = View.VISIBLE
+                            dustin_cover.visibility = View.VISIBLE
+                        }
+
+                        override fun onAnimationEnd(animation: Animator) {}
+                        override fun onAnimationCancel(animation: Animator) {}
+                        override fun onAnimationRepeat(animation: Animator) {}
+                    }).start()
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    imageViewMic.animate().translationY(0f).scaleX(1f).scaleY(1f).setDuration(350)
+                        .setInterpolator(
+                            LinearInterpolator()
+                        ).setListener(
+                            object : Animator.AnimatorListener {
+                                override fun onAnimationStart(animation: Animator) {}
+                                override fun onAnimationEnd(animation: Animator) {
+                                    imageViewMic.visibility = View.INVISIBLE
+                                    imageViewMic.rotation = 0f
+                                    val displacement: Float = if (isLayoutDirectionRightToLeft) {
+                                        dp * 40
+                                    } else {
+                                        -dp * 40
+                                    }
+                                    dustin_cover.animate().rotation(0f).setDuration(150)
+                                        .setStartDelay(50)
+                                        .start()
+                                    dustin.animate().translationX(displacement).setDuration(200)
+                                        .setStartDelay(250).setInterpolator(
+                                            DecelerateInterpolator()
+                                        ).start()
+                                    dustin_cover.animate().translationX(displacement)
+                                        .setDuration(200)
+                                        .setStartDelay(250).setInterpolator(
+                                            DecelerateInterpolator()
+                                        ).setListener(object : Animator.AnimatorListener {
+                                            override fun onAnimationStart(animation: Animator) {}
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                messageInput.visibility = View.VISIBLE
+                                                messageInput.requestFocus()
+                                            }
+
+                                            override fun onAnimationCancel(animation: Animator) {}
+                                            override fun onAnimationRepeat(animation: Animator) {}
+                                        }).start()
+                                }
+
+                                override fun onAnimationCancel(animation: Animator) {}
+                                override fun onAnimationRepeat(animation: Animator) {}
+                            }
+                        ).start()
+                }
+
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            }).start()
+    }
+
     interface InputListener {
         fun onSubmit(input: String)
     }
@@ -283,8 +694,12 @@ class ChatBox @JvmOverloads constructor(
         fun onAddAttachments()
     }
 
-    interface RecorderListener {
-        fun onRecordFinish(time: String, uri: Uri)
+    interface RecordListener {
+        fun onRecordingStarted()
+        fun onRecordingLocked()
+        fun onRecordingCompleted(recordTime: Long)
+        fun onRecordingCanceled()
+        fun onLessThanSecond()
     }
 
     interface TypingListener {
